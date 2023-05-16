@@ -7,6 +7,11 @@ import { CrawlerRepository } from './crawler.repository';
 import { MovieRepository } from 'src/movie/movie.repository';
 import { parse as Parser } from 'node-html-parser';
 import JSON5 from 'jSON5';
+import { Actor } from 'src/actor/actor.entity';
+import { ActorRepository } from 'src/actor/actor.repository';
+import { getConnection } from 'typeorm';
+import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
+import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
 
 @Injectable()
 export class CrawlerService {
@@ -16,6 +21,12 @@ export class CrawlerService {
 
     @InjectRepository(Movie)
     private movieRepository: MovieRepository,
+
+    @InjectRepository(Actor)
+    private actorRepository: ActorRepository,
+
+    @InjectRepository(MovieActorLink)
+    private movieActorLinkRepository: MovieActorLinkRepository,
   ) {}
 
   getHeaders() {
@@ -90,6 +101,82 @@ export class CrawlerService {
     }
   }
 
+  async getActor() {
+    function CreateJob(status: string, content: string) {
+      return {
+        status,
+        content,
+      };
+    }
+
+    const actorList = await this.movieRepository
+      .createQueryBuilder('movie')
+      .select(['movie.id', 'movie.actor'])
+      .getMany();
+
+    let count = 0;
+
+    while (actorList.length > 0) {
+      const actors = actorList.pop();
+
+      const parseActor = JSON.parse(actors.actor);
+
+      const actorData = parseActor.slice(0, 8).map((data) => {
+        const movie_id = actors.id;
+        const name = data.actor?.name || false;
+        const characterName = data.characterName || false;
+
+        if (movie_id && name && characterName) {
+          return { movie_id, name, characterName };
+        }
+      });
+
+      while (actorData.length > 0) {
+        const v = actorData.pop();
+
+        if (v) {
+          const actor = new Actor();
+          actor.name = v.name;
+
+          const isActor = await this.actorRepository.find({
+            where: { name: v.name },
+          });
+
+          if (!isActor.length) {
+            await this.actorRepository.save(actor);
+          }
+
+          const actorId = await this.actorRepository.findOne({
+            where: { name: v.name },
+          });
+
+          const isLink = await this.movieActorLinkRepository.find({
+            where: {
+              movie_id: v.movie_id,
+              actor_id: actorId.id,
+              character: v.characterName,
+            },
+          });
+
+          const link = new MovieActorLink();
+          link.actor_id = actorId.id;
+          link.movie_id = v.movie_id;
+          link.character = v.characterName;
+
+          if (!isLink.length) {
+            await this.movieActorLinkRepository.save(link);
+          }
+
+          count++;
+
+          console.log([actorList.length, count]);
+        }
+      }
+    }
+
+    return 'good';
+  }
+
   async refineCrawlerData() {
     function CreateJob(status: string, content: string) {
       return {
@@ -144,24 +231,30 @@ export class CrawlerService {
           const director = JSON.stringify(content[0].director[0]) || '';
           const genre = JSON.stringify(content[0].genre);
 
-          await this.movieRepository.save({
-            movieId,
-            title,
-            contentType,
-            url,
-            scoring,
-            platform,
-            presentationType,
-            standardWebURL,
-            imageUrl,
-            availableTo,
-            actor,
-            dateCreated,
-            description,
-            duration,
-            director,
-            genre,
+          const isTrue = await this.movieRepository.find({
+            where: { movieId: movieId },
           });
+
+          if (isTrue.length === 0) {
+            await this.movieRepository.save({
+              movieId,
+              title,
+              contentType,
+              url,
+              scoring,
+              platform,
+              presentationType,
+              standardWebURL,
+              imageUrl,
+              availableTo,
+              actor,
+              dateCreated,
+              description,
+              duration,
+              director,
+              genre,
+            });
+          }
         }
       } catch (err) {
         console.log(err);

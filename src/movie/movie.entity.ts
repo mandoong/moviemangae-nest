@@ -1,9 +1,12 @@
+import { Actor } from 'src/actor/actor.entity';
 import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
   Column,
   Unique,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity()
@@ -13,7 +16,6 @@ export class Movie extends BaseEntity {
   })
   id: number;
 
-  @Unique(['movieId'])
   @Column()
   movieId: string;
 
@@ -73,6 +75,9 @@ export class Movie extends BaseEntity {
     type: 'text',
   })
   genre: string;
+
+  @Column()
+  like_count: number;
 
   @Column({
     type: 'timestamp',

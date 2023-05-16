@@ -8,17 +8,25 @@ import { CrawlerService } from './crawler.service';
 import { CrawlerController } from './crawler.controller';
 import { CrawlerRepository } from './crawler.repository';
 import { Crawler } from './crawler.entity';
+import { Actor } from 'src/actor/actor.entity';
+import { ActorRepository } from 'src/actor/actor.repository';
+import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
+import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Crawler,
       Movie,
+      Actor,
+      MovieActorLink,
       CrawlerRepository,
       MovieRepository,
+      ActorRepository,
+      MovieActorLinkRepository,
     ]),
   ],
   controllers: [CrawlerController],
-  providers: [CrawlerService, CrawlerRepository, MovieRepository],
+  providers: [CrawlerService],
 })
 export class CrawlerModule {}

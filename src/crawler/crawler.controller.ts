@@ -29,4 +29,9 @@ export class CrawlerController {
   getTop10Movies(@Param('id') id: string) {
     return this.crawlerService.getTop10Movies(id);
   }
+
+  @Get('/actor')
+  getActors() {
+    return this.crawlerService.getActor();
+  }
 }

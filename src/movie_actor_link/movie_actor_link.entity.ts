@@ -7,22 +7,22 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Crawler extends BaseEntity {
+export class MovieActorLink extends BaseEntity {
   @PrimaryGeneratedColumn({
     type: 'int',
   })
   id: number;
 
-  @Column({
-    length: 30,
-  })
-  movieId: string;
+  @Column()
+  movie_id: number;
+
+  @Column()
+  actor_id: number;
 
   @Column({
     type: 'text',
-    nullable: false,
   })
-  content: string;
+  character: string;
 
   @Column({
     type: 'timestamp',
