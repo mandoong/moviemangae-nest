@@ -11,6 +11,11 @@ export class MovieController {
     return this.movieService.getAllMovie();
   }
 
+  @Get('/:id')
+  getMovieById(@Param('id') id: number) {
+    return this.movieService.getMovieOne(id);
+  }
+
   @Post('/select')
   getMovieSelect(
     @Body('platform') platform: string[],
@@ -19,7 +24,7 @@ export class MovieController {
     return this.movieService.getMovieSelect(skip, platform);
   }
 
-  @Get('/:id')
+  @Get('/platform/:id')
   getMovieByPlatform(@Param('id') id: string) {
     return this.movieService.getMovieByPlatform(id);
   }

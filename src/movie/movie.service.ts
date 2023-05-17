@@ -1,18 +1,12 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movie } from './movie.entity';
-import { Repository } from 'typeorm';
-import { MovieLikeLinkService } from 'src/movie_like_link/movie_like_link.service';
-import { MovieActorLinkService } from 'src/movie_actor_link/movie_actor_link.service';
 import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import { MovieRepository } from './movie.repository';
 import { MovieLikeLinkRepository } from 'src/movie_like_link/movie_like_link.repository';
-import { throwError } from 'rxjs';
+import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
+
 const axios = require('axios');
 const { parse } = require('node-html-parser');
 
@@ -23,14 +17,31 @@ export class MovieService {
     private movieRepository: MovieRepository,
 
     @InjectRepository(MovieActorLink)
-    private movieActorLinkService: MovieActorLinkService,
+    private movieActorLinkRepository: MovieActorLinkRepository,
 
     @InjectRepository(MovieLikeLink)
-    private movieLikeLinkRepository: MovieLikeLinkRepository,
+    private movieLikeLinkRepository: MovieLikeLinkRepository, // @InjectRepository(Actor) // private actorRepository: ActorRepository,
   ) {}
 
   async getAllMovie() {
-    const result = await this.movieRepository.find({});
+    const result = await this.movieRepository
+      .createQueryBuilder('movie')
+      .select([
+        'movie.id',
+        'movie.title',
+        'movie.platform',
+        'movie.imageUrl',
+        'movie.contentType',
+        'movie.scoring',
+        'movie.presentationType',
+        'movie.availableTo',
+        'movie.dateCreated',
+        'movie.genre',
+        'movie.created_at',
+        'movie.updated_at',
+        'movie.like_count',
+      ])
+      .getMany();
 
     return result;
   }
@@ -45,6 +56,18 @@ export class MovieService {
       skip: skip,
       take: 20,
     });
+
+    return result;
+  }
+
+  async getMovieOne(id: number) {
+    const result = await this.movieRepository.findOne({ where: { id: id } });
+
+    const actors = await this.movieActorLinkRepository.find({
+      where: { movie_id: id },
+    });
+
+    result.actors = actors;
 
     return result;
   }
@@ -107,6 +130,4 @@ export class MovieService {
     await this.movieRepository.save(movie);
     return movie;
   }
-
-  async getActors(id: number) {}
 }

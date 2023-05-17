@@ -12,6 +12,7 @@ import { ActorRepository } from 'src/actor/actor.repository';
 import { getConnection } from 'typeorm';
 import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
 import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class CrawlerService {
@@ -83,11 +84,21 @@ export class CrawlerService {
         const edges = result.data.data.popularTitles.edges;
         const newEdges = [];
 
-        edges.forEach((edge) => {
+        edges.forEach(async (edge) => {
           console.log(edge.node.content.title, new Date(), count, newCursor);
           const content = JSON.stringify(edge);
           const movieId = edge.node.id;
-          newEdges.push({ content, movieId });
+          const newData = new Crawler();
+
+          const value = await this.crawlerRepository.findOne({
+            where: { movieId: movieId },
+          });
+          if (value) {
+            newData.content = content;
+            newData.movieId = movieId;
+            newEdges.push(newData);
+          }
+
           count++;
         });
 
@@ -102,13 +113,6 @@ export class CrawlerService {
   }
 
   async getActor() {
-    function CreateJob(status: string, content: string) {
-      return {
-        status,
-        content,
-      };
-    }
-
     const actorList = await this.movieRepository
       .createQueryBuilder('movie')
       .select(['movie.id', 'movie.actor'])
@@ -187,93 +191,6 @@ export class CrawlerService {
     const q = [];
     const fullData = [];
 
-    const result = await this.crawlerRepository
-      .createQueryBuilder('movie')
-      .leftJoinAndSelect('movie', 'crawler', 'movie.movieId = crawler.movieId')
-      .where('crawler.movieId IS NULL')
-      .getMany();
-
-    result.forEach((ele) => {
-      const job = CreateJob('list', ele.content);
-      q.push(job);
-    });
-
-    while (q.length > 0) {
-      const job = q.pop();
-
-      try {
-        const Content = JSON.parse(job.content);
-        const title = Content.node.content.title;
-        const movieId = Content.node.id;
-        const contentType = Content.node.objectType;
-        const url = 'https://www.justwatch.com' + Content.node.content.fullPath;
-        const scoring = JSON.stringify(Content.node.content.scoring);
-        const platform = Content.node.watchNowOffer.package.clearName;
-        const presentationType = Content.node.watchNowOffer.presentationType;
-        const standardWebURL = Content.node.watchNowOffer.standardWebURL;
-        const availableTo = Content.node.watchNowOffer.availableTo || '';
-        console.log(title, q.length);
-
-        const html = await axios.get(url, this.getHeaders());
-        if (html.status === 200) {
-          const root = Parser(html.data);
-          const movieScript = root.querySelector(
-            'script[type=application/ld+json]',
-          );
-
-          const parseData = JSON.parse(movieScript.innerText);
-          const content = parseData['@graph'];
-          const actor = JSON.stringify(content[0].actor);
-          const dateCreated = content[0].dateCreated;
-          const description = content[0].description;
-          const duration = content[0].duration;
-          const imageUrl = content[0].image || '';
-          const director = JSON.stringify(content[0].director[0]) || '';
-          const genre = JSON.stringify(content[0].genre);
-
-          const isTrue = await this.movieRepository.find({
-            where: { movieId: movieId },
-          });
-
-          if (isTrue.length === 0) {
-            await this.movieRepository.save({
-              movieId,
-              title,
-              contentType,
-              url,
-              scoring,
-              platform,
-              presentationType,
-              standardWebURL,
-              imageUrl,
-              availableTo,
-              actor,
-              dateCreated,
-              description,
-              duration,
-              director,
-              genre,
-            });
-          }
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    return fullData;
-  }
-
-  async updateCrawlerData() {
-    function CreateJob(status: string, content: string) {
-      return {
-        status,
-        content,
-      };
-    }
-    const q = [];
-    const fullData = [];
-
     const result = await this.crawlerRepository.find();
 
     result.forEach((ele) => {
@@ -314,32 +231,55 @@ export class CrawlerService {
           const director = JSON.stringify(content[0].director[0]) || '';
           const genre = JSON.stringify(content[0].genre);
 
-          await this.movieRepository.update(
-            { movieId },
-            {
-              movieId,
-              title,
-              contentType,
-              url,
-              scoring,
-              platform,
-              presentationType,
-              standardWebURL,
-              imageUrl,
-              availableTo,
-              actor,
-              dateCreated,
-              description,
-              duration,
-              director,
-              genre,
-            },
-          );
+          const isMovie = await this.movieRepository.findOne({
+            where: { movieId: movieId },
+          });
+
+          if (!isMovie) {
+            const saveData = new Movie();
+
+            saveData.movieId = movieId;
+            saveData.title = title;
+            saveData.contentType = contentType;
+            saveData.url = url;
+            saveData.platform = platform;
+            saveData.presentationType = presentationType;
+            saveData.standardWebURL = standardWebURL;
+            saveData.imageUrl = imageUrl;
+            saveData.availableTo = availableTo;
+            saveData.scoring = scoring;
+            saveData.actor = actor;
+            saveData.dateCreated = dateCreated;
+            saveData.description = description;
+            saveData.duration = duration;
+            saveData.director = director;
+            saveData.genre = genre;
+
+            await this.movieRepository.save(saveData);
+          } else {
+            isMovie.contentType = contentType;
+            isMovie.url = url;
+            isMovie.scoring = scoring;
+            isMovie.platform = platform;
+            isMovie.presentationType = presentationType;
+            isMovie.standardWebURL = standardWebURL;
+            isMovie.imageUrl = imageUrl;
+            isMovie.availableTo = availableTo;
+            isMovie.actor = actor;
+            isMovie.dateCreated = dateCreated;
+            isMovie.description = description;
+            isMovie.duration = duration;
+            isMovie.director = director;
+            isMovie.genre = genre;
+
+            await this.movieRepository.save(isMovie);
+          }
         }
       } catch (err) {
         console.log(err);
       }
     }
+    this.getActor();
 
     return fullData;
   }
@@ -425,7 +365,9 @@ export class CrawlerService {
     return fullData;
   }
 
-  async getTop10Movies(date: string) {
+  async getTop10Movies() {
+    const date = dayjs().add(-1, 'day').format('YYYY-MM-DD');
+    console.log(date);
     const html = await axios.get(
       `https://flixpatrol.com/top10/netflix/south-korea/${date}/`,
       this.getHeaders(),

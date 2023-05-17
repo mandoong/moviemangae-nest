@@ -16,6 +16,7 @@ export class Crawler extends BaseEntity {
   @Column({
     length: 30,
   })
+  @Unique(['movieId'])
   movieId: string;
 
   @Column({

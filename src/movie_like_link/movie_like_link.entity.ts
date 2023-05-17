@@ -11,6 +11,9 @@ export class MovieLikeLink extends BaseEntity {
   movie_id: number;
 
   @Column()
+  comment_id: number;
+
+  @Column()
   user_id: number;
 
   @Column({

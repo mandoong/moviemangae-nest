@@ -15,19 +15,14 @@ export class CrawlerController {
     return this.crawlerService.refineCrawlerData();
   }
 
-  @Get('/update')
-  updateCrawlerData() {
-    return this.crawlerService.updateCrawlerData();
-  }
-
   @Get('/refine/:id')
   refineCrawlerDataById(@Param('id') id: string) {
     return this.crawlerService.refineCrawlerDataById(id);
   }
 
-  @Get('/top10/:id')
-  getTop10Movies(@Param('id') id: string) {
-    return this.crawlerService.getTop10Movies(id);
+  @Get('/top10/')
+  getTop10Movies() {
+    return this.crawlerService.getTop10Movies();
   }
 
   @Get('/actor')

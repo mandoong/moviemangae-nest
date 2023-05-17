@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
+import { Request } from 'express';
 
 @Injectable()
 export class UserService {
@@ -24,5 +25,14 @@ export class UserService {
     }
 
     return result;
+  }
+
+  async getMyProfile(req) {
+    const { email } = req.user;
+    const profile = await this.userRepository.findOne({
+      where: { email: email },
+    });
+
+    return profile;
   }
 }

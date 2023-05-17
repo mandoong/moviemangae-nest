@@ -60,18 +60,26 @@ export class AuthService {
   }
 
   async OAuthLogin({ req, res }) {
-    let user = await this.userRepository.find({
+    let isUser = await this.userRepository.findOne({
       where: { email: req.user.email },
     });
-    console.log(user);
-    if (user.length === 0) {
-      await this.userRepository.save({
-        email: req.user.email,
-        password: '',
-        name: req.user.name,
-      });
-    }
 
-    res.redirect('http://localhost:3002/crawler/top10/2023-05-07');
+    if (!isUser) {
+      const user = new User();
+      user.email = req.user.email;
+      user.password = '';
+      user.name = req.user.name;
+
+      await this.userRepository.save(user);
+    }
+    const email = req.user.email;
+    const payload = { email };
+    const accessToken = this.jwtService.sign(payload);
+
+    console.log(accessToken);
+
+    // res.redirect('http://localhost:3002/crawler/top10/2023-05-07');
+
+    return accessToken;
   }
 }

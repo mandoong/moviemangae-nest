@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { MovieLikeLinkService } from './movie_like_link.service';
 
 @Controller('movie-like')

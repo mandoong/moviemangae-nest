@@ -1,4 +1,5 @@
 import { Actor } from 'src/actor/actor.entity';
+import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
 import {
   BaseEntity,
   Entity,
@@ -7,6 +8,7 @@ import {
   Unique,
   ManyToMany,
   JoinTable,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -30,6 +32,7 @@ export class Movie extends BaseEntity {
 
   @Column({
     type: 'text',
+    default: '',
   })
   scoring: string;
 
@@ -76,8 +79,14 @@ export class Movie extends BaseEntity {
   })
   genre: string;
 
-  @Column()
+  @Column({
+    default: 0,
+  })
   like_count: number;
+
+  @ManyToMany(() => MovieActorLink)
+  @JoinColumn()
+  actors: MovieActorLink[];
 
   @Column({
     type: 'timestamp',
