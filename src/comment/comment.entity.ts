@@ -1,9 +1,12 @@
+import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
   Column,
   Unique,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -42,6 +45,10 @@ export class Comment extends BaseEntity {
     default: 0,
   })
   depth: number;
+
+  @OneToMany(() => MovieLikeLink, (movieLikeLink) => movieLikeLink.likeComment)
+  @JoinColumn()
+  like_user: MovieLikeLink;
 
   @Column({
     type: 'timestamp',

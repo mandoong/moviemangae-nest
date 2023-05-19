@@ -18,7 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class CommentController {
   constructor(private commentService: CommentService) {}
 
-  @Get('/find/:id')
+  @Get('/movie/:id')
   getComments(@Param('id', ParseIntPipe) id: number) {
     return this.commentService.getCommentsByMovieId(id);
   }

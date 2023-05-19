@@ -17,6 +17,9 @@ export class MovieActorLink extends BaseEntity {
   movie_id: number;
 
   @Column()
+  name: string;
+
+  @Column()
   actor_id: number;
 
   @Column({

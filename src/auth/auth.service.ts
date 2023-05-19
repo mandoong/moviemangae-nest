@@ -76,9 +76,9 @@ export class AuthService {
     const payload = { email };
     const accessToken = this.jwtService.sign(payload);
 
-    console.log(accessToken);
+    res.cookie('accessToken', accessToken);
 
-    // res.redirect('http://localhost:3002/crawler/top10/2023-05-07');
+    res.redirect('http://localhost:5173/');
 
     return accessToken;
   }

@@ -13,6 +13,8 @@ import { getConnection } from 'typeorm';
 import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
 import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
 import * as dayjs from 'dayjs';
+import { Top10 } from 'src/top10/top10.entity';
+import { Top10Repository } from 'src/top10/top10.repository';
 
 @Injectable()
 export class CrawlerService {
@@ -28,6 +30,9 @@ export class CrawlerService {
 
     @InjectRepository(MovieActorLink)
     private movieActorLinkRepository: MovieActorLinkRepository,
+
+    @InjectRepository(Top10)
+    private top10Repository: Top10Repository,
   ) {}
 
   getHeaders() {
@@ -93,7 +98,7 @@ export class CrawlerService {
           const value = await this.crawlerRepository.findOne({
             where: { movieId: movieId },
           });
-          if (value) {
+          if (!value) {
             newData.content = content;
             newData.movieId = movieId;
             newEdges.push(newData);
@@ -154,7 +159,7 @@ export class CrawlerService {
             where: { name: v.name },
           });
 
-          const isLink = await this.movieActorLinkRepository.find({
+          const isLink = await this.movieActorLinkRepository.findOne({
             where: {
               movie_id: v.movie_id,
               actor_id: actorId.id,
@@ -163,13 +168,14 @@ export class CrawlerService {
           });
 
           const link = new MovieActorLink();
+          link.name = v.name;
           link.actor_id = actorId.id;
           link.movie_id = v.movie_id;
           link.character = v.characterName;
-
-          if (!isLink.length) {
-            await this.movieActorLinkRepository.save(link);
-          }
+          await this.movieActorLinkRepository.save(link);
+          // if (isLink) {
+          //   await this.movieActorLinkRepository.save(link);
+          // }
 
           count++;
 
@@ -199,7 +205,7 @@ export class CrawlerService {
     });
 
     while (q.length > 0) {
-      const job = q.pop();
+      const job = q.shift();
 
       try {
         const Content = JSON.parse(job.content);
@@ -212,7 +218,6 @@ export class CrawlerService {
         const presentationType = Content.node.watchNowOffer.presentationType;
         const standardWebURL = Content.node.watchNowOffer.standardWebURL;
         const availableTo = Content.node.watchNowOffer.availableTo || '';
-        console.log(title, q.length);
 
         const html = await axios.get(url, this.getHeaders());
         if (html.status === 200) {
@@ -230,6 +235,16 @@ export class CrawlerService {
           const imageUrl = content[0].image || '';
           const director = JSON.stringify(content[0].director[0]) || '';
           const genre = JSON.stringify(content[0].genre);
+          const img = root.querySelector('.title-poster__image > img ');
+          const main_imageUrl = img.getAttribute('data-src');
+
+          const cover = root.querySelector(
+            '.youtube-player__image-preview-container> picture > img ',
+          );
+          const cover2 = root.querySelector('.swiper-slide > picture > img ');
+          const cover_img = cover
+            ? cover.getAttribute('src')
+            : cover2.getAttribute('src');
 
           const isMovie = await this.movieRepository.findOne({
             where: { movieId: movieId },
@@ -246,6 +261,8 @@ export class CrawlerService {
             saveData.presentationType = presentationType;
             saveData.standardWebURL = standardWebURL;
             saveData.imageUrl = imageUrl;
+            saveData.main_imageUrl = main_imageUrl;
+            saveData.cover_imageUrl = cover_img;
             saveData.availableTo = availableTo;
             saveData.scoring = scoring;
             saveData.actor = actor;
@@ -254,6 +271,8 @@ export class CrawlerService {
             saveData.duration = duration;
             saveData.director = director;
             saveData.genre = genre;
+            saveData.updated_at = new Date();
+            console.log('New', q.length, title);
 
             await this.movieRepository.save(saveData);
           } else {
@@ -264,6 +283,8 @@ export class CrawlerService {
             isMovie.presentationType = presentationType;
             isMovie.standardWebURL = standardWebURL;
             isMovie.imageUrl = imageUrl;
+            isMovie.main_imageUrl = main_imageUrl;
+            isMovie.cover_imageUrl = cover_img;
             isMovie.availableTo = availableTo;
             isMovie.actor = actor;
             isMovie.dateCreated = dateCreated;
@@ -271,6 +292,8 @@ export class CrawlerService {
             isMovie.duration = duration;
             isMovie.director = director;
             isMovie.genre = genre;
+            isMovie.updated_at = new Date();
+            console.log('Update', q.length, title);
 
             await this.movieRepository.save(isMovie);
           }
@@ -401,13 +424,17 @@ export class CrawlerService {
         const movieId = movie.data.data.popularTitles.edges[0].node.id;
         console.log(movieId);
 
-        const movieData = await this.movieRepository.find({
-          where: {
-            movieId: movieId,
-          },
-        });
+        result.push(movieId);
+      }
 
-        result.push(movieData);
+      const has = await this.top10Repository.findOne({ where: { date: date } });
+
+      if (!has) {
+        const top10 = new Top10();
+        top10.date = date;
+        top10.movie_id = JSON.stringify(result);
+
+        await this.top10Repository.save(top10);
       }
 
       return result;

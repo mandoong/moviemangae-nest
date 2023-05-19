@@ -8,10 +8,10 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor() {
+  constructor(private configService: ConfigService) {
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
+      clientID: configService.get('GOOGLE_CLIENT_ID'),
+      clientSecret: configService.get('GOOGLE_SECRET'),
       callbackURL: 'http://localhost:3002/auth/login/google',
       scope: ['email', 'profile'],
     });

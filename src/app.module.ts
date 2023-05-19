@@ -10,6 +10,7 @@ import { CommentModule } from './comment/comment.module';
 import { ActorModule } from './actor/actor.module';
 import { MovieActorLinkModule } from './movie_actor_link/movie_actor_link.module';
 import { MovieLikeLinkModule } from './movie_like_link/movie_like_link.module';
+import { Top10Module } from './top10/top10.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MovieLikeLinkModule } from './movie_like_link/movie_like_link.module';
     ActorModule,
     MovieActorLinkModule,
     MovieLikeLinkModule,
+    Top10Module,
   ],
 })
 export class AppModule {}

@@ -1,5 +1,6 @@
 import { Actor } from 'src/actor/actor.entity';
 import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
+import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import {
   BaseEntity,
   Entity,
@@ -9,6 +10,7 @@ import {
   ManyToMany,
   JoinTable,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -56,6 +58,12 @@ export class Movie extends BaseEntity {
   @Column()
   imageUrl: string;
 
+  @Column()
+  main_imageUrl: string;
+
+  @Column()
+  cover_imageUrl: string;
+
   @Column({
     type: 'text',
   })
@@ -83,6 +91,15 @@ export class Movie extends BaseEntity {
     default: 0,
   })
   like_count: number;
+
+  @Column({
+    default: 0,
+  })
+  unlike_count: number;
+
+  @OneToMany(() => MovieLikeLink, (likeMovie) => likeMovie.likeMovie)
+  @JoinColumn()
+  like_user: MovieLikeLink[];
 
   @ManyToMany(() => MovieActorLink)
   @JoinColumn()
