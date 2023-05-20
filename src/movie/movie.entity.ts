@@ -34,7 +34,6 @@ export class Movie extends BaseEntity {
 
   @Column({
     type: 'text',
-    default: '',
   })
   scoring: string;
 

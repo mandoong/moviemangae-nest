@@ -17,7 +17,7 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async SignUp(authCredentialDto: AuthCredentialDto): Promise<void> {
     const { email, password, name } = authCredentialDto;
@@ -60,7 +60,7 @@ export class AuthService {
   }
 
   async OAuthLogin({ req, res }) {
-    let isUser = await this.userRepository.findOne({
+    const isUser = await this.userRepository.findOne({
       where: { email: req.user.email },
     });
 
@@ -78,7 +78,12 @@ export class AuthService {
 
     res.cookie('accessToken', accessToken);
 
-    res.redirect('http://localhost:5173/');
+    const redirect = req.cookies['redirect'];
+    if (redirect) {
+      res.redirect(`http://localhost:5173/${redirect.replace(/\//g, '')}`);
+    } else {
+      res.redirect('http://localhost:5173/');
+    }
 
     return accessToken;
   }
