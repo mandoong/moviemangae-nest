@@ -7,6 +7,8 @@ import { CommentRepository } from './comment.repository';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import { MovieLikeLinkRepository } from 'src/movie_like_link/movie_like_link.repository';
 import { PassportModule } from '@nestjs/passport';
+import { UserRepository } from 'src/user/user.repository';
+import { User } from 'src/user/user.entity';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { PassportModule } from '@nestjs/passport';
       CommentRepository,
       MovieLikeLink,
       MovieLikeLinkRepository,
+      User,
+      UserRepository,
     ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],

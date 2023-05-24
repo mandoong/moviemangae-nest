@@ -10,6 +10,8 @@ import { CommentCreateDto } from './dto/comment.create.dto';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import { MovieLikeLinkRepository } from 'src/movie_like_link/movie_like_link.repository';
 import { resourceLimits } from 'worker_threads';
+import { User } from 'src/user/user.entity';
+import { UserRepository } from 'src/user/user.repository';
 
 @Injectable()
 export class CommentService {
@@ -19,6 +21,9 @@ export class CommentService {
 
     @InjectRepository(MovieLikeLink)
     private movieLikeLinkRepository: MovieLikeLinkRepository,
+
+    @InjectRepository(User)
+    private userRepository: UserRepository,
   ) {}
 
   async getCommentsByMovieId(movie_id: number) {
@@ -31,30 +36,26 @@ export class CommentService {
     return result;
   }
 
-  async getCommentByUserid(commentCreateDto: CommentCreateDto) {
-    const { user_id } = commentCreateDto;
-    const result = await this.commentRepository.find({
-      where: { user_id: user_id },
-    });
-
-    return result;
-  }
-
   async getMyComment(req) {
-    const id = req.user.id;
     const result: Comment[] = await this.commentRepository.find({
-      where: { user_id: id },
+      where: { user: req.id },
+      relations: {
+        user: true,
+      },
     });
 
     return result;
   }
 
-  async createComments(commentCreateDto: CommentCreateDto) {
-    const { movie_id, user_id, depth, content, parent_id } = commentCreateDto;
+  async createComments(commentCreateDto: CommentCreateDto, req) {
+    const { movie_id, depth, content, parent_id } = commentCreateDto;
+    const user = await this.userRepository.findOne({
+      where: { id: req.user.id },
+    });
 
     const comment = new Comment();
     comment.movie_id = movie_id;
-    comment.user_id = user_id;
+    comment.user = user;
     comment.depth = depth;
     comment.content = content;
     comment.parent_id = parent_id;

@@ -1,9 +1,13 @@
+import { Movie } from 'src/movie/movie.entity';
 import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
   Column,
   Unique,
+  ManyToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -26,6 +30,10 @@ export class MovieActorLink extends BaseEntity {
     type: 'text',
   })
   character: string;
+
+  @ManyToOne(() => Movie, (movie) => movie.actors)
+  @JoinColumn()
+  movies: Movie;
 
   @Column({
     type: 'timestamp',

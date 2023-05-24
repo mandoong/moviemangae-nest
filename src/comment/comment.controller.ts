@@ -24,8 +24,12 @@ export class CommentController {
   }
 
   @Post()
-  createComment(@Body(ValidationPipe) commentCreateDto: CommentCreateDto) {
-    return this.commentService.createComments(commentCreateDto);
+  @UseGuards(AuthGuard())
+  createComment(
+    @Body(ValidationPipe) commentCreateDto: CommentCreateDto,
+    @Req() req: Request,
+  ) {
+    return this.commentService.createComments(commentCreateDto, req);
   }
 
   @Get('/my')

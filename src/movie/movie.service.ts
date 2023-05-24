@@ -26,6 +26,7 @@ export class MovieService {
   async getAllMovie() {
     const result = await this.movieRepository
       .createQueryBuilder('movie')
+      .take(100)
       .select([
         'movie.id',
         'movie.title',
@@ -37,6 +38,7 @@ export class MovieService {
         'movie.availableTo',
         'movie.dateCreated',
         'movie.genre',
+        'movie.main_imageUrl',
         'movie.created_at',
         'movie.updated_at',
         'movie.like_count',
@@ -61,7 +63,10 @@ export class MovieService {
   }
 
   async getMovieOne(id: number) {
-    const result = await this.movieRepository.findOne({ where: { id: id } });
+    const result = await this.movieRepository.findOne({
+      where: { id: id },
+      relations: { comments: true },
+    });
 
     const actors = await this.movieActorLinkRepository.find({
       where: { movie_id: id },

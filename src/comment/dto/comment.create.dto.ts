@@ -5,13 +5,11 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { User } from 'src/user/user.entity';
 
 export class CommentCreateDto {
   @IsNumber()
   movie_id: number;
-
-  @IsNumber()
-  user_id: number;
 
   @IsNumber()
   depth: number;

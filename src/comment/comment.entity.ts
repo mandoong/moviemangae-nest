@@ -1,4 +1,6 @@
+import { Movie } from 'src/movie/movie.entity';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
+import { User } from 'src/user/user.entity';
 import {
   BaseEntity,
   Entity,
@@ -7,6 +9,8 @@ import {
   Unique,
   OneToMany,
   JoinColumn,
+  ManyToOne,
+  OneToOne,
 } from 'typeorm';
 
 @Entity()
@@ -17,8 +21,9 @@ export class Comment extends BaseEntity {
   @Column()
   movie_id: number;
 
-  @Column()
-  user_id: number;
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 
   @Column({
     type: 'text',
@@ -49,6 +54,10 @@ export class Comment extends BaseEntity {
   @OneToMany(() => MovieLikeLink, (movieLikeLink) => movieLikeLink.likeComment)
   @JoinColumn()
   like_user: MovieLikeLink;
+
+  @ManyToOne(() => Movie, (movie) => movie.comments)
+  @JoinColumn()
+  comment_movie: Movie;
 
   @Column({
     type: 'timestamp',

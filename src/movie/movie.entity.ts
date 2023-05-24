@@ -1,4 +1,5 @@
 import { Actor } from 'src/actor/actor.entity';
+import { Comment } from 'src/comment/comment.entity';
 import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import {
@@ -11,6 +12,7 @@ import {
   JoinTable,
   JoinColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -100,7 +102,11 @@ export class Movie extends BaseEntity {
   @JoinColumn()
   like_user: MovieLikeLink[];
 
-  @ManyToMany(() => MovieActorLink)
+  @OneToMany(() => Comment, (comment) => comment.comment_movie)
+  @JoinColumn()
+  comments: Comment[];
+
+  @OneToMany(() => MovieActorLink, (actor) => actor.movies)
   @JoinColumn()
   actors: MovieActorLink[];
 
