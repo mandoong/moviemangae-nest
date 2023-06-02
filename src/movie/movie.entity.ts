@@ -35,9 +35,9 @@ export class Movie extends BaseEntity {
   url: string;
 
   @Column({
-    type: 'text',
+    nullable: true,
   })
-  scoring: string;
+  scoring: number;
 
   @Column()
   platform: string;
@@ -48,8 +48,10 @@ export class Movie extends BaseEntity {
   @Column()
   standardWebURL: string;
 
-  @Column()
-  availableTo: string;
+  @Column({
+    nullable: true,
+  })
+  availableTo: Date;
 
   @Column({
     type: 'text',
@@ -75,9 +77,7 @@ export class Movie extends BaseEntity {
   })
   description: string;
 
-  @Column({
-    type: 'text',
-  })
+  @Column()
   duration: string;
 
   @Column()

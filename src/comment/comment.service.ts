@@ -12,6 +12,8 @@ import { MovieLikeLinkRepository } from 'src/movie_like_link/movie_like_link.rep
 import { resourceLimits } from 'worker_threads';
 import { User } from 'src/user/user.entity';
 import { UserRepository } from 'src/user/user.repository';
+import { Movie } from 'src/movie/movie.entity';
+import { MovieRepository } from 'src/movie/movie.repository';
 
 @Injectable()
 export class CommentService {
@@ -22,6 +24,9 @@ export class CommentService {
     @InjectRepository(MovieLikeLink)
     private movieLikeLinkRepository: MovieLikeLinkRepository,
 
+    @InjectRepository(Movie)
+    private movieRepository: MovieRepository,
+
     @InjectRepository(User)
     private userRepository: UserRepository,
   ) {}
@@ -31,6 +36,23 @@ export class CommentService {
       where: {
         movie_id: movie_id,
       },
+      relations: { children: true, like_user: true, user: true },
+    });
+
+    return result;
+  }
+
+  async getCommentCount() {
+    const result = await this.commentRepository.count();
+
+    return result;
+  }
+
+  async getAllComment(page: number) {
+    const result: Comment[] = await this.commentRepository.find({
+      skip: page * 30,
+      take: 30,
+      relations: { children: true, like_user: true, user: true },
     });
 
     return result;
@@ -39,9 +61,7 @@ export class CommentService {
   async getMyComment(req) {
     const result: Comment[] = await this.commentRepository.find({
       where: { user: req.id },
-      relations: {
-        user: true,
-      },
+      relations: { like_user: true, user: true, children: true },
     });
 
     return result;
@@ -53,15 +73,30 @@ export class CommentService {
       where: { id: req.user.id },
     });
 
+    const movie = await this.movieRepository.findOne({
+      where: { id: movie_id },
+      relations: ['comments'],
+    });
+
     const comment = new Comment();
     comment.movie_id = movie_id;
     comment.user = user;
     comment.depth = depth;
     comment.content = content;
-    comment.parent_id = parent_id;
+
+    if (depth > 0) {
+      const parentComment = await this.commentRepository.findOne({
+        where: { id: parent_id },
+        relations: { children: true },
+      });
+      comment.parent = parentComment;
+      await this.commentRepository.save(parentComment);
+    }
+
+    movie.comments.push(comment);
 
     await this.commentRepository.save(comment);
-
+    await this.movieRepository.save(movie);
     return comment;
   }
 

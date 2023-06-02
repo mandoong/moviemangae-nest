@@ -12,8 +12,8 @@ export class UserService {
     private userRepository: UserRepository,
   ) {}
 
-  async getAllUser() {
-    const result = await this.userRepository.find();
+  async getAllUser(page: number) {
+    const result = await this.userRepository.find({ take: 30, skip: page });
 
     return result;
   }

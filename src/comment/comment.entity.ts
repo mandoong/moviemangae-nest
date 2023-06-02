@@ -21,7 +21,7 @@ export class Comment extends BaseEntity {
   @Column()
   movie_id: number;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User, (user) => user.comments)
   @JoinColumn()
   user: User;
 
@@ -41,10 +41,13 @@ export class Comment extends BaseEntity {
   })
   report: number;
 
-  @Column({
-    default: 0,
-  })
-  parent_id: number;
+  @OneToMany(() => Comment, (comment) => comment.parent)
+  @JoinColumn()
+  children: Comment[];
+
+  @ManyToOne(() => Comment, (comment) => comment.children)
+  @JoinColumn()
+  parent: Comment;
 
   @Column({
     default: 0,

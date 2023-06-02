@@ -18,5 +18,6 @@ export class CommentCreateDto {
   parent_id: number;
 
   @IsString()
+  @MinLength(10)
   content: string;
 }

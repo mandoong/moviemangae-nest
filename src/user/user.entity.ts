@@ -1,3 +1,4 @@
+import { Comment } from 'src/comment/comment.entity';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import {
   BaseEntity,
@@ -33,6 +34,10 @@ export class User extends BaseEntity {
   @OneToMany(() => MovieLikeLink, (movie) => movie.likeComment)
   @JoinColumn()
   likeMovie: MovieLikeLink[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  @JoinColumn()
+  comments: Comment[];
 
   @Column({
     type: 'timestamp',

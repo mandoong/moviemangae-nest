@@ -6,6 +6,8 @@ import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import { MovieRepository } from './movie.repository';
 import { MovieLikeLinkRepository } from 'src/movie_like_link/movie_like_link.repository';
 import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
+import { Between, Brackets, ILike, Not } from 'typeorm';
+import { MovieSearchDto } from './dto/movie.search.dto';
 
 const axios = require('axios');
 const { parse } = require('node-html-parser');
@@ -23,10 +25,17 @@ export class MovieService {
     private movieLikeLinkRepository: MovieLikeLinkRepository, // @InjectRepository(Actor) // private actorRepository: ActorRepository,
   ) {}
 
-  async getAllMovie() {
+  async getMovieCount() {
+    const result = this.movieRepository.count();
+
+    return result;
+  }
+
+  async getAllMovie(page: number = 0) {
     const result = await this.movieRepository
       .createQueryBuilder('movie')
-      .take(100)
+      .skip(page * 50)
+      .take(50)
       .select([
         'movie.id',
         'movie.title',
@@ -48,16 +57,74 @@ export class MovieService {
     return result;
   }
 
-  async getMovieSelect(skip: number, platform: string[] = []) {
-    const result = await this.movieRepository.find({
-      where: platform.map((platform) => {
-        return {
-          platform: platform,
-        };
-      }),
-      skip: skip,
-      take: 20,
-    });
+  async getMovieSelect(movieDto: MovieSearchDto) {
+    const {
+      page,
+      platform = [],
+      like,
+      genre = [],
+      scoring = [0, 10],
+      duration,
+      dataCreated,
+      presentationType = [],
+    } = movieDto;
+    const qb = this.movieRepository.createQueryBuilder('movie');
+
+    const sortScoring = scoring.sort((a, b) => a - b);
+
+    if (platform.length > 0) {
+      qb.andWhere(
+        new Brackets((qb) => {
+          platform.forEach((i) => {
+            qb.orWhere(`movie.platform = "${i}"`);
+          });
+        }),
+      );
+    }
+
+    if (presentationType.length > 0) {
+      qb.andWhere(
+        new Brackets((qb) => {
+          presentationType.forEach((i) => {
+            qb.orWhere(`movie.presentationType = "${i}"`);
+          });
+        }),
+      );
+    }
+
+    if (genre.length > 0) {
+      qb.andWhere(
+        new Brackets((qb) => {
+          for (const i of genre) {
+            qb.orWhere(`movie.genre LIKE "%${i}%"`);
+          }
+        }),
+      );
+    }
+
+    if (sortScoring) {
+      qb.andWhere(
+        new Brackets((qb) => {
+          qb.orWhere(
+            'movie.scoring >= :minValue AND movie.scoring <= :maxValue',
+            { minValue: scoring[0], maxValue: scoring[1] },
+          );
+        }),
+      );
+    }
+
+    if (duration) {
+      qb.andWhere(
+        "TIME_TO_SEC(REPLACE(movie.duration, 'T', '')) <= TIME_TO_SEC(:duration)",
+        { duration },
+      );
+    }
+
+    const result = await qb
+      .skip(page * 30)
+      .take(30)
+      .orderBy({ 'movie.id': 'ASC' })
+      .getMany();
 
     return result;
   }
@@ -65,7 +132,7 @@ export class MovieService {
   async getMovieOne(id: number) {
     const result = await this.movieRepository.findOne({
       where: { id: id },
-      relations: { comments: true },
+      relations: ['comments', 'comments.user'],
     });
 
     const actors = await this.movieActorLinkRepository.find({
@@ -134,5 +201,52 @@ export class MovieService {
 
     await this.movieRepository.save(movie);
     return movie;
+  }
+
+  async searchMovie(word: string) {
+    if (!word) {
+      return [];
+    }
+
+    const result = await this.movieRepository.find({
+      where: [
+        {
+          title: ILike(`%${word}%`),
+        },
+      ],
+
+      order: {
+        scoring: 'DESC',
+        dateCreated: 'DESC',
+      },
+    });
+
+    return result;
+  }
+
+  async getDeadlineMovies() {
+    const currentDate = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const result = this.movieRepository.find({
+      where: {
+        availableTo: Between(oneMonthAgo, currentDate),
+      },
+    });
+
+    return result;
+  }
+
+  async getFavoriteMovies() {
+    const result = this.movieRepository.find({
+      order: {
+        like_count: 'DESC',
+      },
+
+      take: 10,
+    });
+
+    return result;
   }
 }

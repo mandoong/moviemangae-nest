@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Query,
   Post,
   Req,
   Res,
@@ -18,8 +19,8 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('/all')
-  getAllUser() {
-    return this.userService.getAllUser();
+  getAllUser(@Query('page') page: number) {
+    return this.userService.getAllUser(page);
   }
 
   @Get('/find/:id')

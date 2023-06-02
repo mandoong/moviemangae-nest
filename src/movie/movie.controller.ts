@@ -1,14 +1,23 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { Movie } from './movie.entity';
+import { MovieSearchDto } from './dto/movie.search.dto';
 
 @Controller('movie')
 export class MovieController {
   constructor(private movieService: MovieService) {}
 
   @Get('/')
-  getAllMovie(): Promise<Movie[]> {
-    return this.movieService.getAllMovie();
+  getAllMovie(@Query('page') page: number): Promise<Movie[]> {
+    return this.movieService.getAllMovie(page);
   }
 
   @Get('/:id')
@@ -16,12 +25,29 @@ export class MovieController {
     return this.movieService.getMovieOne(id);
   }
 
-  @Post('/select')
-  getMovieSelect(
-    @Body('platform') platform: string[],
-    @Body('skip') skip: number,
-  ): Promise<Movie[]> {
-    return this.movieService.getMovieSelect(skip, platform);
+  @Get('/search/movie')
+  getSearchMovie(@Query('word') word: string) {
+    return this.movieService.searchMovie(word);
+  }
+
+  @Get('/list/favorite')
+  getFavoriteMovies() {
+    return this.movieService.getFavoriteMovies();
+  }
+
+  @Get('/list/deadline')
+  getDeadlineMovies() {
+    return this.movieService.getDeadlineMovies();
+  }
+
+  @Get('/count/list')
+  getMovieCount() {
+    return this.movieService.getMovieCount();
+  }
+
+  @Post('/select/movie')
+  getMovieSelect(@Body('dto') dto: MovieSearchDto): Promise<Movie[]> {
+    return this.movieService.getMovieSelect(dto);
   }
 
   @Get('/platform/:id')

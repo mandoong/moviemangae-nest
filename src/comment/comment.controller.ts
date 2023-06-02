@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CommentCreateDto } from './dto/comment.create.dto';
@@ -17,6 +18,16 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('comment')
 export class CommentController {
   constructor(private commentService: CommentService) {}
+
+  @Get('/all')
+  getAllComment(@Query('page') page: number) {
+    return this.commentService.getAllComment(page);
+  }
+
+  @Get('/count')
+  getCommentCount() {
+    return this.commentService.getCommentCount();
+  }
 
   @Get('/movie/:id')
   getComments(@Param('id', ParseIntPipe) id: number) {

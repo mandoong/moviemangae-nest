@@ -80,9 +80,9 @@ export class AuthService {
 
     const redirect = req.cookies['redirect'];
     if (redirect) {
-      res.redirect(`http://localhost:5173/${redirect.replace(/\//g, '')}`);
+      res.redirect(`http://localhost:5174/${redirect.replace(/\//g, '')}`);
     } else {
-      res.redirect('http://localhost:5173/');
+      res.redirect('http://localhost:5174/');
     }
 
     return accessToken;
