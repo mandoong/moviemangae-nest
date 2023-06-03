@@ -8,6 +8,8 @@ import { MovieLikeLinkRepository } from 'src/movie_like_link/movie_like_link.rep
 import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
 import { Between, Brackets, ILike, Not } from 'typeorm';
 import { MovieSearchDto } from './dto/movie.search.dto';
+import { User } from 'src/user/user.entity';
+import { UserRepository } from 'src/user/user.repository';
 
 const axios = require('axios');
 const { parse } = require('node-html-parser');
@@ -20,6 +22,9 @@ export class MovieService {
 
     @InjectRepository(MovieActorLink)
     private movieActorLinkRepository: MovieActorLinkRepository,
+
+    @InjectRepository(User)
+    private userRepository: UserRepository,
 
     @InjectRepository(MovieLikeLink)
     private movieLikeLinkRepository: MovieLikeLinkRepository, // @InjectRepository(Actor) // private actorRepository: ActorRepository,
@@ -129,11 +134,20 @@ export class MovieService {
     return result;
   }
 
-  async getMovieOne(id: number) {
-    const result = await this.movieRepository.findOne({
-      where: { id: id },
-      relations: ['comments', 'comments.user'],
-    });
+  async getMovieOne(id: number, req) {
+    // const result = await this.movieRepository.findOne({
+    //   where: { id: id },
+    //   relations: ['comments', 'comments.user', 'comments.children'],
+    // });
+    const userId = req.user.id;
+
+    const result = await this.movieRepository
+      .createQueryBuilder('movie')
+      .where(`movie.id = '${id}'`)
+      .leftJoinAndSelect('movie.comments', 'comments', `comments.depth = 0 `)
+      .leftJoinAndSelect('comments.user', 'user')
+      .leftJoinAndSelect('comments.children', 'children')
+      .getOne();
 
     const actors = await this.movieActorLinkRepository.find({
       where: { movie_id: id },

@@ -6,10 +6,14 @@ import {
   Param,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { Movie } from './movie.entity';
 import { MovieSearchDto } from './dto/movie.search.dto';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @Controller('movie')
 export class MovieController {
@@ -21,8 +25,9 @@ export class MovieController {
   }
 
   @Get('/:id')
-  getMovieById(@Param('id') id: number) {
-    return this.movieService.getMovieOne(id);
+  @UseGuards(AuthGuard())
+  getMovieById(@Param('id') id: number, @Req() req: Request) {
+    return this.movieService.getMovieOne(id, req);
   }
 
   @Get('/search/movie')

@@ -29,7 +29,6 @@ export class UserService {
 
   async getMyProfile(req) {
     const { email } = req.user;
-    console.log(email);
     const profile = await this.userRepository.findOne({
       where: { email: email },
       relations: {

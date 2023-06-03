@@ -90,11 +90,10 @@ export class CrawlerService {
         const newEdges = [];
 
         // edges.forEach(async (edge) => {
-        //   // console.log(edge.node.content.title, new Date(), count, newCursor);
+
         //   const content = JSON.stringify(edge);
         //   const movieId = edge.node.id;
         //   const newData = new Crawler();
-
         //   const value = await this.crawlerRepository.findOne({
         //     where: { movieId: movieId },
         //   });
@@ -103,7 +102,7 @@ export class CrawlerService {
         //     newData.content = content;
         //     newData.movieId = movieId;
         //     newEdges.push(newData);
-        //     console.log(edge.node.content.title);
+
         //   }
 
         //   count++;
@@ -114,7 +113,7 @@ export class CrawlerService {
             newCursor = edges[39].cursor;
           }
           const edge = edges.pop();
-          // console.log(edge.node.content.title, new Date(), count, newCursor);
+
           const content = JSON.stringify(edge);
           const movieId = edge.node.id;
           const newData = new Crawler();
@@ -206,8 +205,6 @@ export class CrawlerService {
           }
 
           count++;
-
-          console.log([actorList.length, count]);
         }
       }
     }
@@ -346,7 +343,6 @@ export class CrawlerService {
 
   async getTop10Movies() {
     const date = dayjs().add(-1, 'day').format('YYYY-MM-DD');
-    console.log(date);
     const html = await axios.get(
       `https://flixpatrol.com/top10/netflix/south-korea/${date}/`,
       this.getHeaders(),

@@ -19,9 +19,20 @@ import { MovieLikeLinkService } from 'src/movie_like_link/movie_like_link.servic
 import { MovieActorLinkModule } from 'src/movie_actor_link/movie_actor_link.module';
 import { MovieLikeLinkModule } from 'src/movie_like_link/movie_like_link.module';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
+import { User } from 'src/user/user.entity';
+import { UserRepository } from 'src/user/user.repository';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: {
+        expiresIn: 60 * 60,
+      },
+    }),
     TypeOrmModule.forFeature([
       Movie,
       MovieRepository,
@@ -29,6 +40,8 @@ import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
       MovieActorLinkRepository,
       MovieLikeLink,
       MovieActorLinkRepository,
+      User,
+      UserRepository,
     ]),
     MovieActorLinkModule,
     MovieLikeLinkModule,

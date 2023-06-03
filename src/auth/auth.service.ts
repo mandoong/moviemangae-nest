@@ -73,7 +73,8 @@ export class AuthService {
       await this.userRepository.save(user);
     }
     const email = req.user.email;
-    const payload = { email };
+    const id = isUser.id;
+    const payload = { email, id };
     const accessToken = this.jwtService.sign(payload);
 
     res.cookie('accessToken', accessToken);
