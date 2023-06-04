@@ -89,25 +89,6 @@ export class CrawlerService {
         const edges = result.data.data.popularTitles.edges;
         const newEdges = [];
 
-        // edges.forEach(async (edge) => {
-
-        //   const content = JSON.stringify(edge);
-        //   const movieId = edge.node.id;
-        //   const newData = new Crawler();
-        //   const value = await this.crawlerRepository.findOne({
-        //     where: { movieId: movieId },
-        //   });
-
-        //   if (!value) {
-        //     newData.content = content;
-        //     newData.movieId = movieId;
-        //     newEdges.push(newData);
-
-        //   }
-
-        //   count++;
-        // });
-
         while (edges.length > 0) {
           if (edges.length === 40) {
             newCursor = edges[39].cursor;
@@ -126,18 +107,14 @@ export class CrawlerService {
             newData.content = content;
             newData.movieId = movieId;
             newEdges.push(newData);
+            count++;
             console.log(count, 'New!', edge.node.content.title);
           }
-
-          count++;
-          console.log(count);
         }
 
         await this.crawlerRepository.save(newEdges);
-
-        // const lastEdge = edges.pop();
-        // newCursor = lastEdge.cursor;
       } else {
+        console.log('End');
         break;
       }
     }
@@ -223,13 +200,13 @@ export class CrawlerService {
     const fullData = [];
     let count = 0;
 
-    // const result = await this.crawlerRepository
-    //   .createQueryBuilder('crawler')
-    //   .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
-    //   .where('movie.movieId IS NULL')
-    //   .getMany();
+    // const result = await this.crawlerRepository.find();
 
-    const result = await this.crawlerRepository.find();
+    const result = await this.crawlerRepository
+      .createQueryBuilder('crawler')
+      .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
+      .where('movie.movieId IS NULL')
+      .getMany();
 
     result.forEach((ele) => {
       const job = CreateJob('list', ele.content);
@@ -271,15 +248,18 @@ export class CrawlerService {
           const director = JSON.stringify(content[0].director[0]) || '';
           const genre = JSON.stringify(content[0].genre);
           const img = root.querySelector('.title-poster__image > img ');
-          const main_imageUrl = img.getAttribute('data-src');
+          const main_imageUrl = img ? img.getAttribute('data-src') : null;
 
           const cover = root.querySelector(
             '.youtube-player__image-preview-container> picture > img ',
           );
+          console.log(title);
           const cover2 = root.querySelector('.swiper-slide > picture > img ');
           const cover_img = cover
             ? cover.getAttribute('src')
-            : cover2.getAttribute('src');
+            : cover2
+            ? cover2.getAttribute('src')
+            : null;
 
           const isMovie = await this.movieRepository.findOne({
             where: { movieId: movieId },
@@ -311,25 +291,25 @@ export class CrawlerService {
 
             await this.movieRepository.save(saveData);
           } else {
-            isMovie.contentType = contentType;
-            isMovie.url = url;
-            isMovie.scoring = scoring;
-            isMovie.platform = platform;
-            isMovie.presentationType = presentationType;
-            isMovie.standardWebURL = standardWebURL;
-            isMovie.imageUrl = imageUrl;
-            isMovie.main_imageUrl = main_imageUrl;
-            isMovie.cover_imageUrl = cover_img;
-            isMovie.availableTo = new Date(availableTo) || null;
-            isMovie.actor = actor;
-            isMovie.dateCreated = dateCreated;
-            isMovie.description = description;
-            isMovie.duration = duration;
-            isMovie.director = director;
-            isMovie.genre = genre;
-            isMovie.updated_at = new Date();
-            console.log('Update', q.length, title);
-            await this.movieRepository.save(isMovie);
+            // isMovie.contentType = contentType;
+            // isMovie.url = url;
+            // isMovie.scoring = scoring;
+            // isMovie.platform = platform;
+            // isMovie.presentationType = presentationType;
+            // isMovie.standardWebURL = standardWebURL;
+            // isMovie.imageUrl = imageUrl;
+            // isMovie.main_imageUrl = main_imageUrl;
+            // isMovie.cover_imageUrl = cover_img;
+            // isMovie.availableTo = new Date(availableTo) || null;
+            // isMovie.actor = actor;
+            // isMovie.dateCreated = dateCreated;
+            // isMovie.description = description;
+            // isMovie.duration = duration;
+            // isMovie.director = director;
+            // isMovie.genre = genre;
+            // isMovie.updated_at = new Date();
+            // console.log('Update', q.length, title);
+            // await this.movieRepository.save(isMovie);
           }
         }
       } catch (err) {
@@ -337,7 +317,7 @@ export class CrawlerService {
       }
     }
     this.getActor();
-
+    console.log('END');
     return fullData;
   }
 

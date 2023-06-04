@@ -2,6 +2,7 @@ import { Actor } from 'src/actor/actor.entity';
 import { Comment } from 'src/comment/comment.entity';
 import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
+import { User } from 'src/user/user.entity';
 import {
   BaseEntity,
   Entity,
@@ -58,13 +59,19 @@ export class Movie extends BaseEntity {
   })
   actor: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   imageUrl: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   main_imageUrl: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   cover_imageUrl: string;
 
   @Column({
@@ -98,9 +105,9 @@ export class Movie extends BaseEntity {
   })
   unlike_count: number;
 
-  @OneToMany(() => MovieLikeLink, (likeMovie) => likeMovie.likeMovie)
-  @JoinColumn()
-  like_user: MovieLikeLink[];
+  @ManyToMany(() => User, (user) => user.likeMovie)
+  @JoinTable()
+  like_user: User[];
 
   @OneToMany(() => Comment, (comment) => comment.comment_movie)
   @JoinColumn()

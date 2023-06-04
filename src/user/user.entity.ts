@@ -1,10 +1,13 @@
 import { Comment } from 'src/comment/comment.entity';
+import { Movie } from 'src/movie/movie.entity';
 import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
 import {
   BaseEntity,
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   Unique,
@@ -31,13 +34,17 @@ export class User extends BaseEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => MovieLikeLink, (movie) => movie.likeComment)
-  @JoinColumn()
-  likeMovie: MovieLikeLink[];
+  @ManyToMany(() => Movie, (movie) => movie.like_user)
+  @JoinTable()
+  likeMovie: Movie[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
   @JoinColumn()
   comments: Comment[];
+
+  @ManyToMany(() => Comment, (comment) => comment.liked_user)
+  @JoinColumn()
+  liked_comments: Comment[];
 
   @Column({
     type: 'timestamp',

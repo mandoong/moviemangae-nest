@@ -60,9 +60,10 @@ export class MovieController {
     return this.movieService.getMovieByPlatform(id);
   }
 
-  @Get('/:id/like/:user_id')
-  likeMovie(@Param('id') id: number, @Param('user_id') user_id: number) {
-    return this.movieService.likeMovies(id, user_id);
+  @Get('/:id/like/')
+  @UseGuards(AuthGuard())
+  likeMovie(@Param('id') id: number, @Req() req: Request) {
+    return this.movieService.likeMovies(id, req);
   }
 
   @Delete('/:id/like/:user_id')

@@ -36,7 +36,7 @@ export class CommentService {
       where: {
         movie_id: movie_id,
       },
-      relations: { children: true, like_user: true, user: true },
+      relations: { children: true, user: true },
     });
 
     return result;
@@ -48,11 +48,15 @@ export class CommentService {
     return result;
   }
 
-  async getAllComment(page: number) {
+  async getAllComment(page: number = 0) {
     const result: Comment[] = await this.commentRepository.find({
       skip: page * 30,
       take: 30,
-      relations: { children: true, like_user: true, user: true },
+      relations: {
+        children: true,
+        user: true,
+        comment_movie: true,
+      },
     });
 
     return result;
@@ -61,7 +65,7 @@ export class CommentService {
   async getMyComment(req) {
     const result: Comment[] = await this.commentRepository.find({
       where: { user: req.id },
-      relations: { like_user: true, user: true, children: true },
+      relations: { user: true, children: true },
     });
 
     return result;

@@ -29,13 +29,13 @@ export class MovieLikeLink extends BaseEntity {
   @Column()
   Type: string;
 
-  @ManyToOne(() => Movie, (movie) => movie.like_user)
-  @JoinColumn()
-  likeMovie: Movie[];
+  // @ManyToOne(() => Movie, (movie) => movie.like_user)
+  // @JoinColumn()
+  // likeMovie: Movie[];
 
-  @ManyToOne(() => Comment, (comment) => comment.like_user)
-  @JoinColumn()
-  likeComment: Comment[];
+  // @ManyToOne(() => Comment, (comment) => comment.like_user)
+  // @JoinColumn()
+  // likeComment: Comment[];
 
   @Column({
     type: 'timestamp',

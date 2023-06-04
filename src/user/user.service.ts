@@ -29,12 +29,12 @@ export class UserService {
 
   async getMyProfile(req) {
     const { email } = req.user;
-    const profile = await this.userRepository.findOne({
-      where: { email: email },
-      relations: {
-        likeMovie: true,
-      },
-    });
+
+    const profile = await this.userRepository
+      .createQueryBuilder('user')
+      .where(`user.email = :email`, { email: email })
+      .leftJoinAndSelect('user.likeMovie', 'likeMovie')
+      .getOne();
 
     return profile;
   }

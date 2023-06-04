@@ -11,6 +11,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToOne,
+  ManyToMany,
 } from 'typeorm';
 
 @Entity()
@@ -54,9 +55,9 @@ export class Comment extends BaseEntity {
   })
   depth: number;
 
-  @OneToMany(() => MovieLikeLink, (movieLikeLink) => movieLikeLink.likeComment)
+  @ManyToMany(() => User, (user) => user.liked_comments)
   @JoinColumn()
-  like_user: MovieLikeLink;
+  liked_user: User[];
 
   @ManyToOne(() => Movie, (movie) => movie.comments)
   @JoinColumn()

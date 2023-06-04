@@ -10,6 +10,7 @@ import { Between, Brackets, ILike, Not } from 'typeorm';
 import { MovieSearchDto } from './dto/movie.search.dto';
 import { User } from 'src/user/user.entity';
 import { UserRepository } from 'src/user/user.repository';
+import { Request } from 'express';
 
 const axios = require('axios');
 const { parse } = require('node-html-parser');
@@ -144,6 +145,7 @@ export class MovieService {
     const result = await this.movieRepository
       .createQueryBuilder('movie')
       .where(`movie.id = '${id}'`)
+      .leftJoinAndSelect('movie.like_user', 'like_user')
       .leftJoinAndSelect('movie.comments', 'comments', `comments.depth = 0 `)
       .leftJoinAndSelect('comments.user', 'user')
       .leftJoinAndSelect('comments.children', 'children')
@@ -166,27 +168,32 @@ export class MovieService {
     return [result.length, result];
   }
 
-  async likeMovies(id: number, user_id: number) {
-    const result = await this.movieLikeLinkRepository.findOne({
-      where: {
-        movie_id: id,
-        user_id: user_id,
-      },
+  async likeMovies(id: number, req) {
+    const movie = await this.movieRepository.findOne({
+      where: { id: id },
+      relations: { like_user: true },
     });
 
-    if (result) {
-      throw new BadRequestException('이미 좋아요 하였습니다.');
+    const user = await this.userRepository.findOne({
+      where: { id: req.user.id },
+    });
+
+    if (movie.like_user.find((e) => e.id === user.id)) {
+      throw new BadRequestException('이미 좋아요 하셧습니다');
     }
 
-    const movie = await this.movieRepository.findOne({ where: { id: id } });
-
-    movie.like_count = movie.like_count + 1;
+    movie.like_user.push(user);
     await this.movieRepository.save(movie);
 
-    const link = new MovieLikeLink();
-    link.movie_id = id;
-    link.user_id = user_id;
-    await this.movieLikeLinkRepository.save(link);
+    const newUser = await this.userRepository.findOne({
+      where: { id: req.user.id },
+      relations: { likeMovie: true },
+    });
+
+    const newMovie = await this.movieRepository.findOne({ where: { id: id } });
+
+    newUser.likeMovie.push(newMovie);
+    await this.userRepository.save(newUser);
 
     return movie;
   }
