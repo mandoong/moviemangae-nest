@@ -1,4 +1,13 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { join } from 'path';
+import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Actor extends BaseEntity {
@@ -7,6 +16,10 @@ export class Actor extends BaseEntity {
 
   @Column()
   name: string;
+
+  @OneToMany(() => MovieActorLink, (link) => link.actor)
+  @JoinColumn()
+  movies: MovieActorLink[];
 
   @Column({
     type: 'timestamp',

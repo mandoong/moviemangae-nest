@@ -34,17 +34,25 @@ export class User extends BaseEntity {
   @Column()
   name: string;
 
-  @ManyToMany(() => Movie, (movie) => movie.like_user)
+  @OneToMany(() => MovieLikeLink, (link) => link.user)
   @JoinTable()
-  likeMovie: Movie[];
+  liked_movie: MovieLikeLink[];
+
+  @OneToMany(() => MovieLikeLink, (link) => link.user)
+  @JoinTable()
+  disliked_movie: MovieLikeLink[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
   @JoinColumn()
   comments: Comment[];
 
-  @ManyToMany(() => Comment, (comment) => comment.liked_user)
+  @OneToMany(() => MovieLikeLink, (link) => link.user)
   @JoinColumn()
-  liked_comments: Comment[];
+  liked_comments: MovieLikeLink[];
+
+  @OneToMany(() => MovieLikeLink, (link) => link.user)
+  @JoinTable()
+  best_movies: MovieLikeLink[];
 
   @Column({
     type: 'timestamp',

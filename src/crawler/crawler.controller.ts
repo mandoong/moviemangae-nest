@@ -19,9 +19,4 @@ export class CrawlerController {
   getTop10Movies() {
     return this.crawlerService.getTop10Movies();
   }
-
-  @Get('/actor')
-  getActors() {
-    return this.crawlerService.getActor();
-  }
 }

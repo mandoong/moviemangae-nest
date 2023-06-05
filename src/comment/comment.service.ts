@@ -14,6 +14,7 @@ import { User } from 'src/user/user.entity';
 import { UserRepository } from 'src/user/user.repository';
 import { Movie } from 'src/movie/movie.entity';
 import { MovieRepository } from 'src/movie/movie.repository';
+import { Request } from 'express';
 
 @Injectable()
 export class CommentService {
@@ -122,41 +123,61 @@ export class CommentService {
   }
 
   async likeComment(id: number, req) {
-    const result: Comment = await this.commentRepository.findOne({
-      where: { id: id },
+    const comment = await this.commentRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: ['liked_user', 'liked_user.user'],
     });
 
-    if (!result) {
-      throw new BadRequestException('해당 댓글을 찾을 수 없습니다.');
+    if (!comment) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    } else if (comment.liked_user.some((e) => e.user.id === req.user.id)) {
+      throw new BadRequestException('이미 좋아요를 하였습니다.');
     }
 
-    result.like = result.like + 1;
+    const user = await this.userRepository.findOne({
+      where: { id: req.user.id },
+    });
 
     const link = new MovieLikeLink();
+    link.comment = comment;
+    link.user = user;
+    link.type = 'comment';
 
-    link.comment_id = id;
-    link.user_id = req.user.id;
+    comment.like = comment.like + 1;
 
+    await this.commentRepository.save(comment);
     await this.movieLikeLinkRepository.save(link);
+
+    return comment;
   }
 
-  async cancelLikeComment(id, req) {
-    const result: Comment = await this.commentRepository.findOne({
+  async cancelLikeComment(id: number, req) {
+    const comment: Comment = await this.commentRepository.findOne({
       where: { id: id },
     });
 
-    if (!result) {
-      throw new BadRequestException('해당 댓글을 찾을 수 없습니다.');
+    if (!comment) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
     }
 
-    result.like = result.like - 1;
-
-    await this.commentRepository.save(result);
-
     const link = await this.movieLikeLinkRepository.findOne({
-      where: { comment_id: id, user_id: req.user.id },
+      where: {
+        type: 'comment',
+        comment: { id },
+        user: { id: req.user.id },
+      },
+      relations: ['comment', 'user'],
     });
 
+    if (!link) {
+      throw new NotFoundException('해당 댓글에 좋아요 하지 않았습니다.');
+    }
+
+    comment.like = comment.like - 1;
+    await this.commentRepository.save(comment);
     await this.movieLikeLinkRepository.delete(link.id);
+    return comment;
   }
 }

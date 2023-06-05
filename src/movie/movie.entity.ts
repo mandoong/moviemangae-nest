@@ -55,11 +55,6 @@ export class Movie extends BaseEntity {
   availableTo: Date;
 
   @Column({
-    type: 'text',
-  })
-  actor: string;
-
-  @Column({
     nullable: true,
   })
   imageUrl: string;
@@ -103,19 +98,27 @@ export class Movie extends BaseEntity {
   @Column({
     default: 0,
   })
-  unlike_count: number;
+  dislike_count: number;
 
-  @ManyToMany(() => User, (user) => user.likeMovie)
+  @OneToMany(() => MovieLikeLink, (link) => link.movie)
   @JoinTable()
-  like_user: User[];
+  liked_user: MovieLikeLink[];
+
+  @OneToMany(() => MovieLikeLink, (link) => link.movie)
+  @JoinTable()
+  disliked_user: MovieLikeLink[];
 
   @OneToMany(() => Comment, (comment) => comment.comment_movie)
   @JoinColumn()
   comments: Comment[];
 
-  @OneToMany(() => MovieActorLink, (actor) => actor.movies)
+  @OneToMany(() => MovieActorLink, (link) => link.movie)
   @JoinColumn()
   actors: MovieActorLink[];
+
+  @OneToMany(() => MovieLikeLink, (link) => link.movie)
+  @JoinColumn()
+  best_movie_user: MovieLikeLink[];
 
   @Column({
     type: 'timestamp',

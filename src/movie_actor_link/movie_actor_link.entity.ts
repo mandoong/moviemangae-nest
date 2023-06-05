@@ -1,11 +1,10 @@
+import { Actor } from 'src/actor/actor.entity';
 import { Movie } from 'src/movie/movie.entity';
 import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  Unique,
-  ManyToMany,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -17,23 +16,14 @@ export class MovieActorLink extends BaseEntity {
   })
   id: number;
 
-  @Column()
-  movie_id: number;
-
-  @Column()
-  name: string;
-
-  @Column()
-  actor_id: number;
-
-  @Column({
-    type: 'text',
-  })
-  character: string;
-
   @ManyToOne(() => Movie, (movie) => movie.actors)
-  @JoinColumn()
-  movies: Movie;
+  movie: Movie;
+
+  @ManyToOne(() => Actor, (actor) => actor.movies)
+  actor: Actor;
+
+  @Column({ type: 'text' })
+  character: string;
 
   @Column({
     type: 'timestamp',

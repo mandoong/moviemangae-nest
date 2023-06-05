@@ -15,6 +15,7 @@ import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.
 import * as dayjs from 'dayjs';
 import { Top10 } from 'src/top10/top10.entity';
 import { Top10Repository } from 'src/top10/top10.repository';
+import { skip } from 'rxjs';
 
 @Injectable()
 export class CrawlerService {
@@ -120,68 +121,48 @@ export class CrawlerService {
     }
   }
 
-  async getActor() {
-    const actorList = await this.movieRepository
-      .createQueryBuilder('movie')
-      .select(['movie.id', 'movie.actor'])
-      .getMany();
+  async getActor(actors, movie: Movie) {
+    const actorData = actors
+      .filter((data) => data.actor?.name && data.characterName)
+      .map((data) => {
+        const name = data.actor.name.replace(/&#x27;/g, "'");
+        const characterName = data.characterName.replace(/&#x27;/g, "'");
+        return { name, characterName };
+      })
+      .slice(0, 12);
 
-    let count = 0;
-
-    while (actorList.length > 0) {
-      const actors = actorList.pop();
-
-      const parseActor = JSON.parse(actors.actor);
-
-      const actorData = parseActor.slice(0, 8).map((data) => {
-        const movie_id = actors.id;
-        const name = data.actor?.name || false;
-        const characterName = data.characterName || false;
-
-        if (movie_id && name && characterName) {
-          return { movie_id, name, characterName };
-        }
+    for (const data of actorData) {
+      const isActor = await this.actorRepository.findOne({
+        where: { name: data.name },
       });
 
-      while (actorData.length > 0) {
-        const v = actorData.pop();
+      if (!isActor) {
+        const actor = new Actor();
+        actor.name = data.name;
+        await this.actorRepository.save(actor);
 
-        if (v) {
-          const actor = new Actor();
-          actor.name = v.name;
+        const link = new MovieActorLink();
+        link.actor = actor;
+        link.movie = movie;
+        link.character = data.characterName;
 
-          const isActor = await this.actorRepository.find({
-            where: { name: v.name },
-          });
+        await this.movieActorLinkRepository.save(link);
+      } else {
+        const isLink = await this.movieActorLinkRepository.findOne({
+          where: {
+            movie: { id: isActor.id },
+            character: data.character,
+          },
+          relations: ['movie'],
+        });
 
-          if (!isActor.length) {
-            await this.actorRepository.save(actor);
-          }
+        if (!isLink) {
+          const link = new MovieActorLink();
+          link.actor = isActor;
+          link.movie = movie;
+          link.character = data.characterName;
 
-          const actorId = await this.actorRepository.findOne({
-            where: { name: v.name },
-          });
-
-          const isLink = await this.movieActorLinkRepository.findOne({
-            where: {
-              movie_id: v.movie_id,
-              actor_id: actorId.id,
-              character: v.characterName,
-            },
-          });
-
-          // await this.movieActorLinkRepository.save(link);
-          if (!isLink) {
-            const link = new MovieActorLink();
-            link.name = v.name;
-            link.actor_id = actorId.id;
-            link.movie_id = v.movie_id;
-            link.character = v.characterName;
-
-            await this.movieActorLinkRepository.save(link);
-          }
-
-          count++;
+          await this.movieActorLinkRepository.save(link);
         }
       }
     }
@@ -200,13 +181,13 @@ export class CrawlerService {
     const fullData = [];
     let count = 0;
 
-    // const result = await this.crawlerRepository.find();
+    const result = await this.crawlerRepository.find();
 
-    const result = await this.crawlerRepository
-      .createQueryBuilder('crawler')
-      .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
-      .where('movie.movieId IS NULL')
-      .getMany();
+    // const result = await this.crawlerRepository
+    //   .createQueryBuilder('crawler')
+    //   .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
+    //   .where('movie.movieId IS NULL')
+    //   .getMany();
 
     result.forEach((ele) => {
       const job = CreateJob('list', ele.content);
@@ -240,12 +221,12 @@ export class CrawlerService {
 
           const parseData = JSON.parse(movieScript.innerText);
           const content = parseData['@graph'];
-          const actor = JSON.stringify(content[0].actor);
+          const actor = content[0].actor;
           const dateCreated = content[0].dateCreated;
           const description = content[0].description;
           const duration = content[0].duration;
           const imageUrl = content[0].image || '';
-          const director = JSON.stringify(content[0].director[0]) || '';
+          const director = content[0].director[0].name || '';
           const genre = JSON.stringify(content[0].genre);
           const img = root.querySelector('.title-poster__image > img ');
           const main_imageUrl = img ? img.getAttribute('data-src') : null;
@@ -253,7 +234,6 @@ export class CrawlerService {
           const cover = root.querySelector(
             '.youtube-player__image-preview-container> picture > img ',
           );
-          console.log(title);
           const cover2 = root.querySelector('.swiper-slide > picture > img ');
           const cover_img = cover
             ? cover.getAttribute('src')
@@ -265,6 +245,7 @@ export class CrawlerService {
             where: { movieId: movieId },
           });
           count++;
+
           if (!isMovie) {
             const saveData = new Movie();
 
@@ -280,43 +261,46 @@ export class CrawlerService {
             saveData.cover_imageUrl = cover_img;
             saveData.availableTo = new Date(availableTo) || null;
             saveData.scoring = scoring;
-            saveData.actor = actor;
             saveData.dateCreated = dateCreated;
             saveData.description = description;
             saveData.duration = duration;
             saveData.director = director;
             saveData.genre = genre;
             saveData.updated_at = new Date();
+
             console.log('New', q.length, title);
 
             await this.movieRepository.save(saveData);
+            this.getActor(actor, saveData);
           } else {
-            // isMovie.contentType = contentType;
-            // isMovie.url = url;
-            // isMovie.scoring = scoring;
-            // isMovie.platform = platform;
-            // isMovie.presentationType = presentationType;
-            // isMovie.standardWebURL = standardWebURL;
-            // isMovie.imageUrl = imageUrl;
-            // isMovie.main_imageUrl = main_imageUrl;
-            // isMovie.cover_imageUrl = cover_img;
-            // isMovie.availableTo = new Date(availableTo) || null;
-            // isMovie.actor = actor;
-            // isMovie.dateCreated = dateCreated;
-            // isMovie.description = description;
-            // isMovie.duration = duration;
-            // isMovie.director = director;
-            // isMovie.genre = genre;
-            // isMovie.updated_at = new Date();
-            // console.log('Update', q.length, title);
-            // await this.movieRepository.save(isMovie);
+            isMovie.contentType = contentType;
+            isMovie.url = url;
+            isMovie.scoring = scoring;
+            isMovie.platform = platform;
+            isMovie.presentationType = presentationType;
+            isMovie.standardWebURL = standardWebURL;
+            isMovie.imageUrl = imageUrl;
+            isMovie.main_imageUrl = main_imageUrl;
+            isMovie.cover_imageUrl = cover_img;
+            isMovie.availableTo = new Date(availableTo) || null;
+            isMovie.dateCreated = dateCreated;
+            isMovie.description = description;
+            isMovie.duration = duration;
+            isMovie.director = director;
+            isMovie.genre = genre;
+            isMovie.updated_at = new Date();
+
+            console.log('Update', q.length, title);
+
+            await this.movieRepository.save(isMovie);
+            this.getActor(actor, isMovie);
           }
         }
       } catch (err) {
         console.log(err);
       }
     }
-    this.getActor();
+
     console.log('END');
     return fullData;
   }

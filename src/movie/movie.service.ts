@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movie } from './movie.entity';
 import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
@@ -136,92 +140,22 @@ export class MovieService {
   }
 
   async getMovieOne(id: number, req) {
-    // const result = await this.movieRepository.findOne({
-    //   where: { id: id },
-    //   relations: ['comments', 'comments.user', 'comments.children'],
-    // });
     const userId = req.user.id;
 
     const result = await this.movieRepository
       .createQueryBuilder('movie')
       .where(`movie.id = '${id}'`)
-      .leftJoinAndSelect('movie.like_user', 'like_user')
+      .leftJoinAndSelect('movie.liked_user', 'liked_user')
       .leftJoinAndSelect('movie.comments', 'comments', `comments.depth = 0 `)
       .leftJoinAndSelect('comments.user', 'user')
       .leftJoinAndSelect('comments.children', 'children')
+      .leftJoinAndSelect('comments.liked_user', 'comment_liked_user')
+      .leftJoinAndSelect('comment_liked_user.user', 'comment_liked_user_id')
+      .leftJoinAndSelect('movie.actors', 'actors')
+      .leftJoinAndSelect('actors.actor', 'actor')
       .getOne();
 
-    const actors = await this.movieActorLinkRepository.find({
-      where: { movie_id: id },
-    });
-
-    result.actors = actors;
-
     return result;
-  }
-
-  async getMovieByPlatform(platform: string) {
-    const result = await this.movieRepository.find({
-      where: { platform: platform },
-    });
-
-    return [result.length, result];
-  }
-
-  async likeMovies(id: number, req) {
-    const movie = await this.movieRepository.findOne({
-      where: { id: id },
-      relations: { like_user: true },
-    });
-
-    const user = await this.userRepository.findOne({
-      where: { id: req.user.id },
-    });
-
-    if (movie.like_user.find((e) => e.id === user.id)) {
-      throw new BadRequestException('이미 좋아요 하셧습니다');
-    }
-
-    movie.like_user.push(user);
-    await this.movieRepository.save(movie);
-
-    const newUser = await this.userRepository.findOne({
-      where: { id: req.user.id },
-      relations: { likeMovie: true },
-    });
-
-    const newMovie = await this.movieRepository.findOne({ where: { id: id } });
-
-    newUser.likeMovie.push(newMovie);
-    await this.userRepository.save(newUser);
-
-    return movie;
-  }
-
-  async cancelLikeMovie(id: number, user_id: number) {
-    const result = await this.movieLikeLinkRepository.findOne({
-      where: {
-        movie_id: id,
-        user_id: user_id,
-      },
-    });
-
-    if (!result) {
-      throw new BadRequestException('해당 유저는 좋아요를 하지 않았습니다.');
-    }
-
-    await this.movieLikeLinkRepository.delete(result.id);
-
-    const movie = await this.movieRepository.findOne({ where: { id: id } });
-
-    if (movie.like_count >= 0) {
-      movie.like_count = movie.like_count - 1;
-    } else {
-      throw new BadRequestException();
-    }
-
-    await this.movieRepository.save(movie);
-    return movie;
   }
 
   async searchMovie(word: string) {
@@ -269,5 +203,94 @@ export class MovieService {
     });
 
     return result;
+  }
+
+  async addMyMovieList(id: number, req, type: string) {
+    const isLink = await this.movieLikeLinkRepository.findOne({
+      where: { movie: { id }, user: { id: req.user.id }, type: type },
+    });
+    console.log(isLink);
+    if (isLink) {
+      throw new BadRequestException('이미 목록에 있습니다');
+    }
+
+    const movie = await this.movieRepository.findOne({ where: { id: id } });
+
+    if (!movie) {
+      throw new NotFoundException('해당 영화를 찾을 수 없습니다.');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: req.user.id },
+    });
+
+    const link = new MovieLikeLink();
+    switch (type) {
+      case 'likeMovie':
+        movie.like_count = movie.like_count + 1;
+        await this.movieRepository.save(movie);
+        link.user = user;
+        link.movie = movie;
+        link.type = 'likeMovie';
+        await this.movieLikeLinkRepository.save(link);
+        break;
+
+      case 'dislikeMovie':
+        movie.dislike_count = movie.dislike_count + 1;
+        await this.movieRepository.save(movie);
+        link.user = user;
+        link.movie = movie;
+        link.type = 'dislikeMovie';
+        await this.movieLikeLinkRepository.save(link);
+        break;
+
+      case 'bestMovie':
+        link.movie = movie;
+        link.user = user;
+        link.type = 'bestMovie';
+        await this.movieLikeLinkRepository.save(link);
+        break;
+    }
+
+    return movie;
+  }
+
+  async removeMyMovieList(id: number, req, type: string) {
+    const movie = await this.movieRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!movie) {
+      throw new NotFoundException('해당 영화를 찾을 수 없습니다.');
+    }
+
+    const link = await this.movieLikeLinkRepository.findOne({
+      where: {
+        type: type,
+        movie: { id },
+        user: { id: req.user.id },
+      },
+      relations: ['movie', 'user'],
+    });
+
+    if (!link) {
+      throw new NotFoundException('해당 목록이 없습니다.');
+    }
+
+    switch (type) {
+      case 'like':
+        movie.like_count = movie.like_count - 1;
+        break;
+
+      case 'dislike':
+        movie.dislike_count = movie.dislike_count - 1;
+        break;
+    }
+
+    await this.movieRepository.save(movie);
+    await this.movieLikeLinkRepository.delete(link.id);
+
+    console.log(movie);
+    return movie;
   }
 }

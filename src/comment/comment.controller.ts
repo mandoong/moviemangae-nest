@@ -15,7 +15,7 @@ import { CommentService } from './comment.service';
 import { CommentCreateDto } from './dto/comment.create.dto';
 import { AuthGuard } from '@nestjs/passport';
 
-@Controller('comment')
+@Controller('comments')
 export class CommentController {
   constructor(private commentService: CommentService) {}
 
@@ -34,7 +34,12 @@ export class CommentController {
     return this.commentService.getCommentsByMovieId(id);
   }
 
-  @Post()
+  @Delete('/:id')
+  deleteComment(@Param('id') id: number) {
+    return this.commentService.deleteComment(id);
+  }
+
+  @Post('/')
   @UseGuards(AuthGuard())
   createComment(
     @Body(ValidationPipe) commentCreateDto: CommentCreateDto,
@@ -49,18 +54,13 @@ export class CommentController {
     return this.commentService.getMyComment(req);
   }
 
-  @Delete('/:id')
-  deleteComment(@Param('id') id: number) {
-    return this.commentService.deleteComment(id);
-  }
-
-  @Get('/like/:id')
+  @Post('/:id/like')
   @UseGuards(AuthGuard())
   likeComment(@Param('id') id: number, @Req() req) {
     return this.commentService.likeComment(id, req);
   }
 
-  @Delete('/like/:id')
+  @Delete('/:id/like')
   @UseGuards(AuthGuard())
   cancelLikeComment(@Param('id') id: number, @Req() req) {
     return this.commentService.cancelLikeComment(id, req);

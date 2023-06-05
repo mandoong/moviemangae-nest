@@ -55,9 +55,9 @@ export class Comment extends BaseEntity {
   })
   depth: number;
 
-  @ManyToMany(() => User, (user) => user.liked_comments)
+  @OneToMany(() => MovieLikeLink, (link) => link.comment)
   @JoinColumn()
-  liked_user: User[];
+  liked_user: MovieLikeLink[];
 
   @ManyToOne(() => Movie, (movie) => movie.comments)
   @JoinColumn()

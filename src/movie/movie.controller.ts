@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   Req,
+  Patch,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { Movie } from './movie.entity';
@@ -15,59 +16,63 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 
-@Controller('movie')
+@Controller('movies')
 export class MovieController {
   constructor(private movieService: MovieService) {}
 
-  @Get('/')
+  @Get('/all')
   getAllMovie(@Query('page') page: number): Promise<Movie[]> {
     return this.movieService.getAllMovie(page);
   }
 
-  @Get('/:id')
+  @Get('/find/:id')
   @UseGuards(AuthGuard())
   getMovieById(@Param('id') id: number, @Req() req: Request) {
     return this.movieService.getMovieOne(id, req);
   }
 
-  @Get('/search/movie')
+  @Get('/search')
   getSearchMovie(@Query('word') word: string) {
     return this.movieService.searchMovie(word);
   }
 
-  @Get('/list/favorite')
+  @Get('/favorite')
   getFavoriteMovies() {
     return this.movieService.getFavoriteMovies();
   }
 
-  @Get('/list/deadline')
+  @Get('/deadline')
   getDeadlineMovies() {
     return this.movieService.getDeadlineMovies();
   }
 
-  @Get('/count/list')
+  @Get('/count')
   getMovieCount() {
     return this.movieService.getMovieCount();
   }
 
-  @Post('/select/movie')
+  @Post('/select')
   getMovieSelect(@Body('dto') dto: MovieSearchDto): Promise<Movie[]> {
     return this.movieService.getMovieSelect(dto);
   }
 
-  @Get('/platform/:id')
-  getMovieByPlatform(@Param('id') id: string) {
-    return this.movieService.getMovieByPlatform(id);
-  }
-
-  @Get('/:id/like/')
+  @Post('/:id/like/')
   @UseGuards(AuthGuard())
-  likeMovie(@Param('id') id: number, @Req() req: Request) {
-    return this.movieService.likeMovies(id, req);
+  addMyMovieList(
+    @Param('id') id: number,
+    @Req() req: Request,
+    @Body('type') type: string,
+  ) {
+    return this.movieService.addMyMovieList(id, req, type);
   }
 
-  @Delete('/:id/like/:user_id')
-  cancelLikeMovie(@Param('id') id: number, @Param('user_id') user_id: number) {
-    return this.movieService.cancelLikeMovie(id, user_id);
+  @Delete('/:id/like')
+  @UseGuards(AuthGuard())
+  removeMyMovieList(
+    @Param('id') id: number,
+    @Req() req: Request,
+    @Body('type') type: string,
+  ) {
+    return this.movieService.removeMyMovieList(id, req, type);
   }
 }
