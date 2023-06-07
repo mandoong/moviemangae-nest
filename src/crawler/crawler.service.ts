@@ -55,7 +55,7 @@ export class CrawlerService {
       const payload = {
         operationName: 'GetPopularTitles',
         variables: {
-          popularTitlesSortBy: 'TRENDING',
+          popularTitlesSortBy: 'IMDB_SCORE',
           first: 40,
           platform: 'WEB',
           sortRandomSeed: 0,
@@ -86,7 +86,7 @@ export class CrawlerService {
 
       const result = await axios.post(url, payload);
 
-      if (result.status === 200) {
+      if (result.status === 200 && count < 1960) {
         const edges = result.data.data.popularTitles.edges;
         const newEdges = [];
 
@@ -103,13 +103,15 @@ export class CrawlerService {
           const value = await this.crawlerRepository.findOne({
             where: { movieId: movieId },
           });
+          count++;
 
           if (!value) {
             newData.content = content;
             newData.movieId = movieId;
             newEdges.push(newData);
-            count++;
             console.log(count, 'New!', edge.node.content.title);
+          } else {
+            console.log(count);
           }
         }
 
@@ -181,13 +183,13 @@ export class CrawlerService {
     const fullData = [];
     let count = 0;
 
-    const result = await this.crawlerRepository.find();
+    // const result = await this.crawlerRepository.find();
 
-    // const result = await this.crawlerRepository
-    //   .createQueryBuilder('crawler')
-    //   .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
-    //   .where('movie.movieId IS NULL')
-    //   .getMany();
+    const result = await this.crawlerRepository
+      .createQueryBuilder('crawler')
+      .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
+      .where('movie.movieId IS NULL')
+      .getMany();
 
     result.forEach((ele) => {
       const job = CreateJob('list', ele.content);
@@ -226,7 +228,8 @@ export class CrawlerService {
           const description = content[0].description;
           const duration = content[0].duration;
           const imageUrl = content[0].image || '';
-          const director = content[0].director[0].name || '';
+          const director =
+            content[0].director.length >= 1 ? content[0].director[0].name : '';
           const genre = JSON.stringify(content[0].genre);
           const img = root.querySelector('.title-poster__image > img ');
           const main_imageUrl = img ? img.getAttribute('data-src') : null;

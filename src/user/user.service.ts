@@ -3,7 +3,6 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
-import { Request } from 'express';
 
 @Injectable()
 export class UserService {
@@ -25,6 +24,27 @@ export class UserService {
     }
 
     return result;
+  }
+
+  async getMyLikeMovie(req) {
+    const user = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id: req.user.id })
+      .leftJoinAndSelect(
+        'user.liked_movie',
+        'liked_movie',
+        'liked_movie.type = "likeMovie"',
+      )
+      .leftJoinAndSelect('liked_movie.movie', 'likeMovie')
+      .leftJoinAndSelect(
+        'user.disliked_movie',
+        'disliked_movie',
+        'disliked_movie.type = "dislikeMovie"',
+      )
+      .leftJoinAndSelect('disliked_movie.movie', 'dislikeMovie')
+      .getOne();
+
+    return user;
   }
 
   async getMyProfile(req) {

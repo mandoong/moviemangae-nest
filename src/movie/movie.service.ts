@@ -142,7 +142,7 @@ export class MovieService {
   async getMovieOne(id: number, req) {
     const userId = req.user.id;
 
-    const result = await this.movieRepository
+    let result = await this.movieRepository
       .createQueryBuilder('movie')
       .where(`movie.id = '${id}'`)
       .leftJoinAndSelect('movie.liked_user', 'liked_user')
@@ -155,6 +155,8 @@ export class MovieService {
       .leftJoinAndSelect('actors.actor', 'actor')
       .getOne();
 
+    result.genre = JSON.parse(result.genre);
+
     return result;
   }
 
@@ -163,7 +165,7 @@ export class MovieService {
       return [];
     }
 
-    const result = await this.movieRepository.find({
+    let result = await this.movieRepository.find({
       where: [
         {
           title: ILike(`%${word}%`),
@@ -174,6 +176,11 @@ export class MovieService {
         scoring: 'DESC',
         dateCreated: 'DESC',
       },
+    });
+
+    result = result.map((e) => {
+      e.genre = JSON.parse(e.genre);
+      return e;
     });
 
     return result;

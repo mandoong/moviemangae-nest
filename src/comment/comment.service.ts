@@ -65,8 +65,8 @@ export class CommentService {
 
   async getMyComment(req) {
     const result: Comment[] = await this.commentRepository.find({
-      where: { user: req.id },
-      relations: { user: true, children: true },
+      where: { user: { id: req.user.id } },
+      relations: { user: true, children: true, comment_movie: true },
     });
 
     return result;

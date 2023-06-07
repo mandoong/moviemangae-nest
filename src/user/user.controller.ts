@@ -33,4 +33,10 @@ export class UserController {
   getMyProfile(@Req() req: Request) {
     return this.userService.getMyProfile(req);
   }
+
+  @Get('/like/movie')
+  @UseGuards(AuthGuard())
+  getMyLikeMovie(@Req() req: Request) {
+    return this.userService.getMyLikeMovie(req);
+  }
 }
