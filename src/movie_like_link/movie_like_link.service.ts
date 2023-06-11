@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MovieLikeLink } from './movie_like_link.entity';
 import { MovieLikeLinkRepository } from './movie_like_link.repository';
-import { UserRepository } from 'src/user/user.repository';
+import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class MovieLikeLinkService {
@@ -12,7 +12,7 @@ export class MovieLikeLinkService {
 
     @InjectRepository(MovieLikeLink)
     private userRepository: UserRepository,
-  ) {}
+  ) { }
 
   async MovieLikeUser() {
     const result = await this.movieLikeLinkRepository

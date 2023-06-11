@@ -1,6 +1,6 @@
-import { Comment } from 'src/comment/comment.entity';
-import { Movie } from 'src/movie/movie.entity';
-import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
+import { Comment } from '../comment/comment.entity';
+import { Movie } from '../movie/movie.entity';
+import { MovieLikeLink } from '../movie_like_link/movie_like_link.entity';
 import {
   BaseEntity,
   Column,

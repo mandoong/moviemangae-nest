@@ -7,13 +7,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './comment.entity';
 import { CommentRepository } from './comment.repository';
 import { CommentCreateDto } from './dto/comment.create.dto';
-import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
-import { MovieLikeLinkRepository } from 'src/movie_like_link/movie_like_link.repository';
+import { MovieLikeLink } from '../movie_like_link/movie_like_link.entity';
+import { MovieLikeLinkRepository } from '../movie_like_link/movie_like_link.repository';
 import { resourceLimits } from 'worker_threads';
-import { User } from 'src/user/user.entity';
-import { UserRepository } from 'src/user/user.repository';
-import { Movie } from 'src/movie/movie.entity';
-import { MovieRepository } from 'src/movie/movie.repository';
+import { User } from '../user/user.entity';
+import { UserRepository } from '../user/user.repository';
+import { Movie } from '../movie/movie.entity';
+import { MovieRepository } from '../movie/movie.repository';
 import { Request } from 'express';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class CommentService {
 
     @InjectRepository(User)
     private userRepository: UserRepository,
-  ) {}
+  ) { }
 
   async getCommentsByMovieId(movie_id: number) {
     const result = await this.commentRepository.find({
@@ -49,7 +49,7 @@ export class CommentService {
     return result;
   }
 
-  async getAllComment(page: number = 0) {
+  async getAllComment(page = 0) {
     const result: Comment[] = await this.commentRepository.find({
       skip: page * 30,
       take: 30,

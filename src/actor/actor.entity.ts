@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
+import { MovieActorLink } from '../movie_actor_link/movie_actor_link.entity';
 import {
   BaseEntity,
   Column,

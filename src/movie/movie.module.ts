@@ -4,13 +4,13 @@ import { MovieService } from './movie.service';
 import { MovieRepository } from './movie.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Movie } from './movie.entity';
-import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
-import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
-import { MovieActorLinkModule } from 'src/movie_actor_link/movie_actor_link.module';
-import { MovieLikeLinkModule } from 'src/movie_like_link/movie_like_link.module';
-import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
-import { User } from 'src/user/user.entity';
-import { UserRepository } from 'src/user/user.repository';
+import { MovieActorLinkRepository } from '../movie_actor_link/movie_actor_link.repository';
+import { MovieActorLink } from '../movie_actor_link/movie_actor_link.entity';
+import { MovieActorLinkModule } from '../movie_actor_link/movie_actor_link.module';
+import { MovieLikeLinkModule } from '../movie_like_link/movie_like_link.module';
+import { MovieLikeLink } from '../movie_like_link/movie_like_link.entity';
+import { User } from '../user/user.entity';
+import { UserRepository } from '../user/user.repository';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
@@ -39,4 +39,4 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [MovieController],
   providers: [MovieService],
 })
-export class MovieModule {}
+export class MovieModule { }

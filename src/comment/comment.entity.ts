@@ -1,6 +1,6 @@
-import { Movie } from 'src/movie/movie.entity';
-import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
-import { User } from 'src/user/user.entity';
+import { Movie } from '../movie/movie.entity';
+import { MovieLikeLink } from '../movie_like_link/movie_like_link.entity';
+import { User } from '../user/user.entity';
 import {
   BaseEntity,
   Entity,

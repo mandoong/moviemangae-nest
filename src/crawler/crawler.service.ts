@@ -2,18 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { Crawler } from './crawler.entity';
-import { Movie } from 'src/movie/movie.entity';
+import { Movie } from '../movie/movie.entity';
 import { CrawlerRepository } from './crawler.repository';
-import { MovieRepository } from 'src/movie/movie.repository';
+import { MovieRepository } from '../movie/movie.repository';
 import { parse as Parser } from 'node-html-parser';
-import { Actor } from 'src/actor/actor.entity';
-import { ActorRepository } from 'src/actor/actor.repository';
+import { Actor } from '../actor/actor.entity';
+import { ActorRepository } from '../actor/actor.repository';
 import { getConnection } from 'typeorm';
-import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
-import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
+import { MovieActorLink } from '../movie_actor_link/movie_actor_link.entity';
+import { MovieActorLinkRepository } from '../movie_actor_link/movie_actor_link.repository';
 import dayjs = require('dayjs');
-import { Top10 } from 'src/top10/top10.entity';
-import { Top10Repository } from 'src/top10/top10.repository';
+import { Top10 } from '../top10/top10.entity';
+import { Top10Repository } from '../top10/top10.repository';
 import { skip } from 'rxjs';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class CrawlerService {
 
     @InjectRepository(Top10)
     private top10Repository: Top10Repository,
-  ) {}
+  ) { }
 
   getHeaders() {
     return {
@@ -240,8 +240,8 @@ export class CrawlerService {
           const cover_img = cover
             ? cover.getAttribute('src')
             : cover2
-            ? cover2.getAttribute('src')
-            : null;
+              ? cover2.getAttribute('src')
+              : null;
 
           const isMovie = await this.movieRepository.findOne({
             where: { movieId: movieId },

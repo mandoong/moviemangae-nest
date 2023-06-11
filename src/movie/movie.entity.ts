@@ -1,8 +1,6 @@
-import { Actor } from 'src/actor/actor.entity';
-import { Comment } from 'src/comment/comment.entity';
-import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
-import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
-import { User } from 'src/user/user.entity';
+import { Comment } from '../comment/comment.entity';
+import { MovieActorLink } from '../movie_actor_link/movie_actor_link.entity';
+import { MovieLikeLink } from '../movie_like_link/movie_like_link.entity';
 import {
   BaseEntity,
   Entity,

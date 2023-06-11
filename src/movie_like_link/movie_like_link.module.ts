@@ -4,8 +4,8 @@ import { MovieLikeLink } from './movie_like_link.entity';
 import { MovieLikeLinkRepository } from './movie_like_link.repository';
 import { MovieLikeLinkController } from './movie_like_link.controller';
 import { MovieLikeLinkService } from './movie_like_link.service';
-import { User } from 'src/user/user.entity';
-import { UserRepository } from 'src/user/user.repository';
+import { User } from '../user/user.entity';
+import { UserRepository } from '../user/user.repository';
 
 @Module({
   imports: [
@@ -20,4 +20,4 @@ import { UserRepository } from 'src/user/user.repository';
   providers: [MovieLikeLinkService],
   exports: [MovieLikeLinkService],
 })
-export class MovieLikeLinkModule {}
+export class MovieLikeLinkModule { }

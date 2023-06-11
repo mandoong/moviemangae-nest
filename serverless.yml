@@ -1,6 +1,8 @@
 service: serverless-example
 
 plugins:
+  - 'serverless-plugin-typescript'
+  - serverless-plugin-optimize
   - serverless-offline
   - serverless-plugin-common-excludes
 
@@ -11,7 +13,7 @@ provider:
 
 functions:
   main:
-    handler: dist/main.handler
+    handler: src/main.handler
     events:
       - http:
           method: ANY

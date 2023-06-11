@@ -4,8 +4,8 @@ import { Top10Repository } from './top10.repository';
 import { Top10Controller } from './top10.controller';
 import { Top10Service } from './top10.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Movie } from 'src/movie/movie.entity';
-import { MovieRepository } from 'src/movie/movie.repository';
+import { Movie } from '../movie/movie.entity';
+import { MovieRepository } from '../movie/movie.repository';
 
 @Module({
   imports: [
@@ -14,4 +14,4 @@ import { MovieRepository } from 'src/movie/movie.repository';
   controllers: [Top10Controller],
   providers: [Top10Service],
 })
-export class Top10Module {}
+export class Top10Module { }

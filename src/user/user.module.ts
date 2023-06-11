@@ -7,8 +7,8 @@ import { UserRepository } from './user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthService } from 'src/auth/auth.service';
-import { AuthController } from 'src/auth/auth.controller';
+import { AuthService } from '../auth/auth.service';
+import { AuthController } from '../auth/auth.controller';
 
 @Module({
   imports: [
@@ -24,4 +24,4 @@ import { AuthController } from 'src/auth/auth.controller';
   controllers: [UserController],
   providers: [UserService, UserRepository, AuthService, AuthController],
 })
-export class UserModule {}
+export class UserModule { }

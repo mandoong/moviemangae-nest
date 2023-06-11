@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Top10 } from './top10.entity';
 import { Top10Repository } from './top10.repository';
 import dayjs = require('dayjs');
-import { Movie } from 'src/movie/movie.entity';
-import { MovieRepository } from 'src/movie/movie.repository';
+import { Movie } from '../movie/movie.entity';
+import { MovieRepository } from '../movie/movie.repository';
 
 @Injectable()
 export class Top10Service {
@@ -14,7 +14,7 @@ export class Top10Service {
 
     @InjectRepository(Movie)
     private movieRepository: MovieRepository,
-  ) {}
+  ) { }
 
   async getTop10Today() {
     const today = dayjs().add(-1, 'day').format('YYYY-MM-DD');

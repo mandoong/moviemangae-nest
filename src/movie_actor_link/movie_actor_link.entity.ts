@@ -1,5 +1,5 @@
-import { Actor } from 'src/actor/actor.entity';
-import { Movie } from 'src/movie/movie.entity';
+import { Actor } from '../actor/actor.entity';
+import { Movie } from '../movie/movie.entity';
 import {
   BaseEntity,
   Entity,

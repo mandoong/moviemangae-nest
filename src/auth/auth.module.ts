@@ -5,10 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { GoogleStrategy } from './gogle.strategy';
-import { User } from 'src/user/user.entity';
-import { UserRepository } from 'src/user/user.repository';
+import { User } from '../user/user.entity';
+import { UserRepository } from '../user/user.repository';
 import { JwtStrategy } from './jwt.strategy';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { KakaoStrategy } from './kakao.strategy';
 import { NaverStrategy } from './naver.strategy';
 import { ConfigService } from '@nestjs/config';
@@ -34,4 +34,4 @@ import { ConfigService } from '@nestjs/config';
     NaverStrategy,
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User } from 'src/user/user.entity';
+import { User } from '../user/user.entity';
 import { Repository } from 'typeorm';
 import { AuthCredentialDto } from './dto/user.auth-credential.dto';
 import * as bcrypt from 'bcryptjs';
@@ -17,7 +17,7 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async SignUp(authCredentialDto: AuthCredentialDto): Promise<void> {
     const { email, password, name } = authCredentialDto;

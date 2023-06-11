@@ -5,15 +5,15 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movie } from './movie.entity';
-import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
-import { MovieLikeLink } from 'src/movie_like_link/movie_like_link.entity';
+import { MovieActorLink } from '../movie_actor_link/movie_actor_link.entity';
+import { MovieLikeLink } from '../movie_like_link/movie_like_link.entity';
 import { MovieRepository } from './movie.repository';
-import { MovieLikeLinkRepository } from 'src/movie_like_link/movie_like_link.repository';
-import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
+import { MovieLikeLinkRepository } from '../movie_like_link/movie_like_link.repository';
+import { MovieActorLinkRepository } from '../movie_actor_link/movie_actor_link.repository';
 import { Between, Brackets, ILike, Not } from 'typeorm';
 import { MovieSearchDto } from './dto/movie.search.dto';
-import { User } from 'src/user/user.entity';
-import { UserRepository } from 'src/user/user.repository';
+import { User } from '../user/user.entity';
+import { UserRepository } from '../user/user.repository';
 import { Request } from 'express';
 
 const axios = require('axios');
@@ -33,7 +33,7 @@ export class MovieService {
 
     @InjectRepository(MovieLikeLink)
     private movieLikeLinkRepository: MovieLikeLinkRepository, // @InjectRepository(Actor) // private actorRepository: ActorRepository,
-  ) {}
+  ) { }
 
   async getMovieCount() {
     const result = this.movieRepository.count();
@@ -41,7 +41,7 @@ export class MovieService {
     return result;
   }
 
-  async getAllMovie(page: number = 0) {
+  async getAllMovie(page = 0) {
     const result = await this.movieRepository
       .createQueryBuilder('movie')
       .skip(page * 50)
@@ -142,7 +142,7 @@ export class MovieService {
   async getMovieOne(id: number, req) {
     const userId = req.user.id;
 
-    let result = await this.movieRepository
+    const result = await this.movieRepository
       .createQueryBuilder('movie')
       .where(`movie.id = '${id}'`)
       .leftJoinAndSelect('movie.liked_user', 'liked_user')

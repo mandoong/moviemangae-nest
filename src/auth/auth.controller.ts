@@ -1,6 +1,6 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 
@@ -9,11 +9,17 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
   @Get('/login/google')
   @UseGuards(AuthGuard('google'))
-  async loginGoogle() {}
+  async loginGoogle(@Req() req: Request, @Res() res: Response) {
+    try {
+      this.authService.OAuthLogin(req, res);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   @Get('/login/hello')
   async log() {
@@ -23,7 +29,11 @@ export class AuthController {
   @Get('/login/google-redirect')
   @UseGuards(AuthGuard('google'))
   async loginGoogleRedirect(@Req() req: Request, @Res() res: Response) {
-    this.authService.OAuthLogin(req, res);
+    try {
+      this.authService.OAuthLogin(req, res);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   @Get('/login/naver')

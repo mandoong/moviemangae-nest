@@ -1,15 +1,12 @@
-import { Comment } from 'src/comment/comment.entity';
-import { Movie } from 'src/movie/movie.entity';
-import { User } from 'src/user/user.entity';
+import { Comment } from '../comment/comment.entity';
+import { Movie } from '../movie/movie.entity';
+import { User } from '../user/user.entity';
 import {
   BaseEntity,
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToMany,
   ManyToOne,
-  JoinColumn,
-  OneToMany,
 } from 'typeorm';
 
 @Entity()

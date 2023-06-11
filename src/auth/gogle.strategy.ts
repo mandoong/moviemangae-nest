@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Strategy } from 'passport-google-oauth20';
-import { User } from 'src/user/user.entity';
+import { User } from '../user/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
