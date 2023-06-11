@@ -6,13 +6,12 @@ import { Movie } from 'src/movie/movie.entity';
 import { CrawlerRepository } from './crawler.repository';
 import { MovieRepository } from 'src/movie/movie.repository';
 import { parse as Parser } from 'node-html-parser';
-import JSON5 from 'jSON5';
 import { Actor } from 'src/actor/actor.entity';
 import { ActorRepository } from 'src/actor/actor.repository';
 import { getConnection } from 'typeorm';
 import { MovieActorLink } from 'src/movie_actor_link/movie_actor_link.entity';
 import { MovieActorLinkRepository } from 'src/movie_actor_link/movie_actor_link.repository';
-import * as dayjs from 'dayjs';
+import dayjs = require('dayjs');
 import { Top10 } from 'src/top10/top10.entity';
 import { Top10Repository } from 'src/top10/top10.repository';
 import { skip } from 'rxjs';
@@ -55,7 +54,7 @@ export class CrawlerService {
       const payload = {
         operationName: 'GetPopularTitles',
         variables: {
-          popularTitlesSortBy: 'IMDB_SCORE',
+          popularTitlesSortBy: 'POPULAR',
           first: 40,
           platform: 'WEB',
           sortRandomSeed: 0,

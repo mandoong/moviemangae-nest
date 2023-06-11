@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Top10 } from './top10.entity';
 import { Top10Repository } from './top10.repository';
-import * as dayjs from 'dayjs';
+import dayjs = require('dayjs');
 import { Movie } from 'src/movie/movie.entity';
 import { MovieRepository } from 'src/movie/movie.repository';
 

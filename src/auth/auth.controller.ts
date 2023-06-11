@@ -13,19 +13,28 @@ export class AuthController {
 
   @Get('/login/google')
   @UseGuards(AuthGuard('google'))
-  async loginGoogle(@Req() req: Request, @Res() res: Response) {
-    this.authService.OAuthLogin({ req, res });
+  async loginGoogle() {}
+
+  @Get('/login/hello')
+  async log() {
+    console.log('hello');
+  }
+
+  @Get('/login/google-redirect')
+  @UseGuards(AuthGuard('google'))
+  async loginGoogleRedirect(@Req() req: Request, @Res() res: Response) {
+    this.authService.OAuthLogin(req, res);
   }
 
   @Get('/login/naver')
   @UseGuards(AuthGuard('naver'))
   async loginNaver(@Req() req: Request, @Res() res: Response) {
-    this.authService.OAuthLogin({ req, res });
+    this.authService.OAuthLogin(req, res);
   }
 
   @Get('/login/kakao')
   @UseGuards(AuthGuard('kakao'))
   async loginKakao(@Req() req: Request, @Res() res: Response) {
-    this.authService.OAuthLogin({ req, res });
+    this.authService.OAuthLogin(req, res);
   }
 }

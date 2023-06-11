@@ -59,7 +59,7 @@ export class AuthService {
     }
   }
 
-  async OAuthLogin({ req, res }) {
+  async OAuthLogin(req, res) {
     const isUser = await this.userRepository.findOne({
       where: { email: req.user.email },
     });
@@ -71,21 +71,25 @@ export class AuthService {
       user.name = req.user.name;
 
       await this.userRepository.save(user);
-    }
-    const email = req.user.email;
-    const id = isUser.id;
-    const payload = { email, id };
-    const accessToken = this.jwtService.sign(payload);
 
-    res.cookie('accessToken', accessToken);
-
-    const redirect = req.cookies['redirect'];
-    if (redirect) {
-      res.redirect(`http://localhost:5173/${redirect.replace(/\//g, '')}`);
+      const email = user.email;
+      const id = user.id;
+      const payload = { email, id };
+      const accessToken = this.jwtService.sign(payload);
+      res.cookie('accessToken', accessToken);
     } else {
-      res.redirect('http://localhost:5173/');
+      const email = isUser.email;
+      const id = isUser.id;
+      const payload = { email, id };
+      const accessToken = this.jwtService.sign(payload);
+      res.cookie('accessToken', accessToken);
     }
 
-    return accessToken;
+    // const redirect = req.cookies['redirect'];
+    // console.log(redirect);
+
+    res.redirect('https://moviemangae-front-git-develop-mandoong.vercel.app');
+
+    return isUser;
   }
 }
