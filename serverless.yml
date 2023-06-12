@@ -14,6 +14,14 @@ provider:
 functions:
   main:
     handler: src/main.handler
+    timeout: 15
+    environment:
+      DB_PORT: '3306'
+      DB_HOST: 'moviemangae.caj1lc4wgtzk.ap-northeast-2.rds.amazonaws.com'
+      DB_USERNAME: 'Woong'
+      DB_PASSWORD: 'goddns12!!'
+      DB_NAME: 'movie_mangae'
+      NODE_SERVER_PORT: '3002'
     events:
       - http:
           method: ANY
