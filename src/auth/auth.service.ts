@@ -17,7 +17,7 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async SignUp(authCredentialDto: AuthCredentialDto): Promise<void> {
     const { email, password, name } = authCredentialDto;
@@ -59,11 +59,14 @@ export class AuthService {
     }
   }
 
-  async OAuthLogin(req, res) {
+  async OAuthLogin(req) {
+    const { email } = req.user;
     const isUser = await this.userRepository.findOne({
-      where: { email: req.user.email },
+      where: { email: email },
     });
     console.log(isUser);
+
+    let accessToken;
 
     if (!isUser) {
       const user = new User();
@@ -76,21 +79,13 @@ export class AuthService {
       const email = user.email;
       const id = user.id;
       const payload = { email, id };
-      const accessToken = this.jwtService.sign(payload);
-      res.cookie('accessToken', accessToken);
+      accessToken = this.jwtService.sign(payload);
     } else {
       const email = isUser.email;
       const id = isUser.id;
       const payload = { email, id };
-      const accessToken = this.jwtService.sign(payload);
-      res.cookie('accessToken', accessToken);
+      accessToken = this.jwtService.sign(payload);
     }
-
-    // const redirect = req.cookies['redirect'];
-    // console.log(redirect);
-
-    res.redirect('https://moviemangae-front-git-develop-mandoong.vercel.app');
-
-    return isUser;
+    return accessToken;
   }
 }

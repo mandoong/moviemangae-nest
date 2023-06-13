@@ -10,11 +10,10 @@ import { Repository } from 'typeorm';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
     super({
-      clientID:
-        '1018839334367-qtgmojd5mkdi724mq0hinkm02rc1t99c.apps.googleusercontent.com',
-      clientSecret: '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',
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
       callbackURL:
-        'https://oqwc40fv0b.execute-api.ap-northeast-2.amazonaws.com/dev/auth/login/google',
+        'https://moviemangae-front-git-develop-mandoong.vercel.app/login/google',
       scope: ['email', 'profile'],
     });
   }

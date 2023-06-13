@@ -15,7 +15,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    // PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: {
@@ -27,11 +27,11 @@ import { ConfigService } from '@nestjs/config';
   controllers: [AuthController],
   providers: [
     AuthService,
-    // UserService,
-    // JwtStrategy,
+    UserService,
+    JwtStrategy,
     GoogleStrategy,
-    // KakaoStrategy,
-    // NaverStrategy,
+    KakaoStrategy,
+    NaverStrategy,
   ],
 })
-export class AuthModule { }
+export class AuthModule {}

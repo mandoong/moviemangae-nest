@@ -174,11 +174,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-<<<<<<< HEAD
-                "S3Key": "serverless/serverless-example/dev/1686547360144-2023-06-12T05:22:40.144Z/serverless-example.zip"
-=======
-                "S3Key": "serverless/serverless-example/dev/1686558098928-2023-06-12T08:21:38.928Z/serverless-example.zip"
->>>>>>> feature/google-oauth-only
+                "S3Key": "serverless/serverless-example/dev/1686634182683-2023-06-13T05:29:42.683Z/serverless-example.zip"
               },
               "Handler": "src/main.handler",
               "Runtime": "nodejs16.x",
@@ -206,22 +202,14 @@
               "MainLogGroup"
             ]
           },
-<<<<<<< HEAD
-          "MainLambdaVersionMWxMU7RyvQzXVgH7PFT1FMr84yyBkGUK4osN2KoM": {
-=======
-          "MainLambdaVersionJL1TvU6Ql6Dq8E5mmfDh6RwUWYYy3KfeWZaoWn0Ok3Y": {
->>>>>>> feature/google-oauth-only
+          "MainLambdaVersionPum7H8ol4jBhYTPj43lPFVPqAgxN9yUovDEFUgeoLM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "MainLambdaFunction"
               },
-<<<<<<< HEAD
-              "CodeSha256": "kcPB1E6DFLH02mROIAVLHV/9aBrdyuLDR3AgAwSgdRA="
-=======
-              "CodeSha256": "x/beC5zFHttFweoSee5GdQhTHBizCgxX8p29HLQq0Ak="
->>>>>>> feature/google-oauth-only
+              "CodeSha256": "JnQBNjEiveQu7ZM218DRKsuF1LlJIab70B/hxitVeyQ="
             }
           },
           "ApiGatewayRestApi": {
@@ -297,11 +285,7 @@
               "MainLambdaPermissionApiGateway"
             ]
           },
-<<<<<<< HEAD
-          "ApiGatewayDeployment1686547106820": {
-=======
-          "ApiGatewayDeployment1686558037343": {
->>>>>>> feature/google-oauth-only
+          "ApiGatewayDeployment1686633963057": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -363,11 +347,7 @@
           "MainLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-<<<<<<< HEAD
-              "Ref": "MainLambdaVersionMWxMU7RyvQzXVgH7PFT1FMr84yyBkGUK4osN2KoM"
-=======
-              "Ref": "MainLambdaVersionJL1TvU6Ql6Dq8E5mmfDh6RwUWYYy3KfeWZaoWn0Ok3Y"
->>>>>>> feature/google-oauth-only
+              "Ref": "MainLambdaVersionPum7H8ol4jBhYTPj43lPFVPqAgxN9yUovDEFUgeoLM"
             },
             "Export": {
               "Name": "sls-serverless-example-dev-MainLambdaFunctionQualifiedArn"
@@ -495,8 +475,6 @@
     "functions": {
       "main": {
         "handler": "src/main.handler",
-<<<<<<< HEAD
-=======
         "timeout": 15,
         "environment": {
           "DB_PORT": "3306",
@@ -506,7 +484,6 @@
           "DB_NAME": "movie_mangae",
           "NODE_SERVER_PORT": "3002"
         },
->>>>>>> feature/google-oauth-only
         "events": [
           {
             "http": {
@@ -527,11 +504,7 @@
         "memory": 1024,
         "runtime": "nodejs16.x",
         "vpc": {},
-<<<<<<< HEAD
-        "versionLogicalId": "MainLambdaVersionMWxMU7RyvQzXVgH7PFT1FMr84yyBkGUK4osN2KoM"
-=======
-        "versionLogicalId": "MainLambdaVersionJL1TvU6Ql6Dq8E5mmfDh6RwUWYYy3KfeWZaoWn0Ok3Y"
->>>>>>> feature/google-oauth-only
+        "versionLogicalId": "MainLambdaVersionPum7H8ol4jBhYTPj43lPFVPqAgxN9yUovDEFUgeoLM"
       }
     },
     "configValidationMode": "warn",
@@ -550,17 +523,10 @@
     },
     "layers": {},
     "isDashboardMonitoringPreconfigured": false,
-<<<<<<< HEAD
     "artifact": "C:\\Works\\moviemangae-nest\\.build\\.serverless\\serverless-example.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/serverless-example/dev/1686547360144-2023-06-12T05:22:40.144Z",
-=======
-    "artifact": "/Users/unyounghyun/Documents/moviemangae-nest/.build/.serverless/serverless-example.zip"
-  },
-  "package": {
-    "artifactDirectoryName": "serverless/serverless-example/dev/1686558098928-2023-06-12T08:21:38.928Z",
->>>>>>> feature/google-oauth-only
+    "artifactDirectoryName": "serverless/serverless-example/dev/1686634182683-2023-06-13T05:29:42.683Z",
     "artifact": "serverless-example.zip"
   }
 }

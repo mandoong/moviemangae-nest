@@ -9,7 +9,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       clientID: process.env.KAKAO_CLIENT_ID,
       clientSecret: process.env.KAKAO_SECRET,
       callbackURL:
-        'https://oqwc40fv0b.execute-api.ap-northeast-2.amazonaws.com/dev/auth/login/kakao',
+        'https://moviemangae-front-git-develop-mandoong.vercel.app/login/kakao',
       scope: ['account_email', 'profile_nickname'],
     });
   }
