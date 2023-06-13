@@ -63,6 +63,7 @@ export class AuthService {
     const isUser = await this.userRepository.findOne({
       where: { email: req.user.email },
     });
+    console.log(isUser);
 
     if (!isUser) {
       const user = new User();

@@ -36,6 +36,7 @@
     "cookie-parser": "^1.4.6",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
+    "googleapis": "^118.0.0",
     "graceful-fs": "^4.2.11",
     "mermaid": "^10.1.0",
     "middy": "^0.36.0",

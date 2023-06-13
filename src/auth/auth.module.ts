@@ -27,11 +27,11 @@ import { ConfigService } from '@nestjs/config';
   controllers: [AuthController],
   providers: [
     AuthService,
-    UserService,
-    JwtStrategy,
+    // UserService,
+    // JwtStrategy,
     GoogleStrategy,
-    KakaoStrategy,
-    NaverStrategy,
+    // KakaoStrategy,
+    // NaverStrategy,
   ],
 })
 export class AuthModule { }
