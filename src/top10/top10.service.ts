@@ -14,10 +14,11 @@ export class Top10Service {
 
     @InjectRepository(Movie)
     private movieRepository: MovieRepository,
-  ) { }
+  ) {}
 
-  async getTop10Today() {
-    const today = dayjs().add(-1, 'day').format('YYYY-MM-DD');
+  async getTop10Today(type: String) {
+    const day = type === 'yesterday' ? -2 : -1;
+    const today = dayjs().add(day, 'day').format('YYYY-MM-DD');
 
     const top10 = await this.top10Repository.findOne({
       where: { date: today },

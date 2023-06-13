@@ -33,7 +33,7 @@ export class MovieService {
 
     @InjectRepository(MovieLikeLink)
     private movieLikeLinkRepository: MovieLikeLinkRepository, // @InjectRepository(Actor) // private actorRepository: ActorRepository,
-  ) { }
+  ) {}
 
   async getMovieCount() {
     const result = this.movieRepository.count();

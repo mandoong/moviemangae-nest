@@ -162,9 +162,9 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/serverless-example/dev/1686367198051-2023-06-10T03:19:58.051Z/serverless-example.zip"
+          "S3Key": "serverless/serverless-example/dev/1686547360144-2023-06-12T05:22:40.144Z/serverless-example.zip"
         },
-        "Handler": "dist/main.handler",
+        "Handler": "src/main.handler",
         "Runtime": "nodejs16.x",
         "FunctionName": "serverless-example-dev-main",
         "MemorySize": 1024,
@@ -180,14 +180,14 @@
         "MainLogGroup"
       ]
     },
-    "MainLambdaVersion6awcc0LmT5pSg9R6NjqyvvOuoy4RiG5lc5RmzhEY8Q": {
+    "MainLambdaVersionMWxMU7RyvQzXVgH7PFT1FMr84yyBkGUK4osN2KoM": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "MainLambdaFunction"
         },
-        "CodeSha256": "Gn4OMZ9xwebnAcGe3+nk+jFLpd+v4T0ZApsSuJpmR4w="
+        "CodeSha256": "kcPB1E6DFLH02mROIAVLHV/9aBrdyuLDR3AgAwSgdRA="
       }
     },
     "ApiGatewayRestApi": {
@@ -263,7 +263,7 @@
         "MainLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1686367108352": {
+    "ApiGatewayDeployment1686547106820": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -325,7 +325,7 @@
     "MainLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "MainLambdaVersion6awcc0LmT5pSg9R6NjqyvvOuoy4RiG5lc5RmzhEY8Q"
+        "Ref": "MainLambdaVersionMWxMU7RyvQzXVgH7PFT1FMr84yyBkGUK4osN2KoM"
       },
       "Export": {
         "Name": "sls-serverless-example-dev-MainLambdaFunctionQualifiedArn"

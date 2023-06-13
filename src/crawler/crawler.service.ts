@@ -33,7 +33,7 @@ export class CrawlerService {
 
     @InjectRepository(Top10)
     private top10Repository: Top10Repository,
-  ) { }
+  ) {}
 
   getHeaders() {
     return {
@@ -182,13 +182,13 @@ export class CrawlerService {
     const fullData = [];
     let count = 0;
 
-    // const result = await this.crawlerRepository.find();
+    const result = await this.crawlerRepository.find();
 
-    const result = await this.crawlerRepository
-      .createQueryBuilder('crawler')
-      .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
-      .where('movie.movieId IS NULL')
-      .getMany();
+    // const result = await this.crawlerRepository
+    //   .createQueryBuilder('crawler')
+    //   .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
+    //   .where('movie.movieId IS NULL')
+    //   .getMany();
 
     result.forEach((ele) => {
       const job = CreateJob('list', ele.content);
@@ -240,8 +240,8 @@ export class CrawlerService {
           const cover_img = cover
             ? cover.getAttribute('src')
             : cover2
-              ? cover2.getAttribute('src')
-              : null;
+            ? cover2.getAttribute('src')
+            : null;
 
           const isMovie = await this.movieRepository.findOne({
             where: { movieId: movieId },

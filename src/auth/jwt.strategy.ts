@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { UnauthorizedException } from '@nestjs/common/exceptions';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../user/user.entity';
+import { config } from 'dotenv';
+config();
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

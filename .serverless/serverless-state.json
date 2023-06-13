@@ -174,9 +174,9 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/serverless-example/dev/1686367198051-2023-06-10T03:19:58.051Z/serverless-example.zip"
+                "S3Key": "serverless/serverless-example/dev/1686547360144-2023-06-12T05:22:40.144Z/serverless-example.zip"
               },
-              "Handler": "dist/main.handler",
+              "Handler": "src/main.handler",
               "Runtime": "nodejs16.x",
               "FunctionName": "serverless-example-dev-main",
               "MemorySize": 1024,
@@ -192,14 +192,14 @@
               "MainLogGroup"
             ]
           },
-          "MainLambdaVersion6awcc0LmT5pSg9R6NjqyvvOuoy4RiG5lc5RmzhEY8Q": {
+          "MainLambdaVersionMWxMU7RyvQzXVgH7PFT1FMr84yyBkGUK4osN2KoM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "MainLambdaFunction"
               },
-              "CodeSha256": "Gn4OMZ9xwebnAcGe3+nk+jFLpd+v4T0ZApsSuJpmR4w="
+              "CodeSha256": "kcPB1E6DFLH02mROIAVLHV/9aBrdyuLDR3AgAwSgdRA="
             }
           },
           "ApiGatewayRestApi": {
@@ -275,7 +275,7 @@
               "MainLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1686367108352": {
+          "ApiGatewayDeployment1686547106820": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -337,7 +337,7 @@
           "MainLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "MainLambdaVersion6awcc0LmT5pSg9R6NjqyvvOuoy4RiG5lc5RmzhEY8Q"
+              "Ref": "MainLambdaVersionMWxMU7RyvQzXVgH7PFT1FMr84yyBkGUK4osN2KoM"
             },
             "Export": {
               "Name": "sls-serverless-example-dev-MainLambdaFunctionQualifiedArn"
@@ -456,13 +456,15 @@
       "vpc": {}
     },
     "plugins": [
+      "serverless-plugin-typescript",
+      "serverless-plugin-optimize",
       "serverless-offline",
       "serverless-plugin-common-excludes"
     ],
     "pluginsData": {},
     "functions": {
       "main": {
-        "handler": "dist/main.handler",
+        "handler": "src/main.handler",
         "events": [
           {
             "http": {
@@ -473,12 +475,18 @@
           }
         ],
         "name": "serverless-example-dev-main",
-        "package": {},
+        "package": {
+          "exclude": [
+            "node_modules/serverless-plugin-typescript"
+          ],
+          "include": [],
+          "patterns": []
+        },
         "memory": 1024,
         "timeout": 6,
         "runtime": "nodejs16.x",
         "vpc": {},
-        "versionLogicalId": "MainLambdaVersion6awcc0LmT5pSg9R6NjqyvvOuoy4RiG5lc5RmzhEY8Q"
+        "versionLogicalId": "MainLambdaVersionMWxMU7RyvQzXVgH7PFT1FMr84yyBkGUK4osN2KoM"
       }
     },
     "configValidationMode": "warn",
@@ -497,10 +505,10 @@
     },
     "layers": {},
     "isDashboardMonitoringPreconfigured": false,
-    "artifact": "C:\\Works\\moviemangae-nest\\.serverless\\serverless-example.zip"
+    "artifact": "C:\\Works\\moviemangae-nest\\.build\\.serverless\\serverless-example.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/serverless-example/dev/1686367198051-2023-06-10T03:19:58.051Z",
+    "artifactDirectoryName": "serverless/serverless-example/dev/1686547360144-2023-06-12T05:22:40.144Z",
     "artifact": "serverless-example.zip"
   }
 }

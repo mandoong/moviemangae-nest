@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import serverlessExpress from '@vendia/serverless-express';
 import { Callback, Context, Handler } from 'aws-lambda';
 import { ConfigService } from '@nestjs/config';
-const cookieParser = require('cookie-parser');
+import cookieParser from 'cookie-parser';
 
 let server: Handler;
 
@@ -40,8 +40,8 @@ async function bootstrap(): Promise<Handler> {
     methods: ['GET', 'POST', 'DELETE'],
     credentials: false,
   });
-  await app.init();
   app.use(cookieParser());
+  await app.init();
 
   const expressApp = app.getHttpAdapter().getInstance();
   return serverlessExpress({ app: expressApp });
