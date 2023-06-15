@@ -118,6 +118,10 @@ export class Movie extends BaseEntity {
   @JoinColumn()
   best_movie_user: MovieLikeLink[];
 
+  @OneToMany(() => MovieLikeLink, (link) => link.movie)
+  @JoinColumn()
+  view_movie_user: MovieLikeLink[];
+
   @Column({
     type: 'timestamp',
     nullable: false,

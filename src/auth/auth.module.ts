@@ -19,7 +19,7 @@ import { ConfigService } from '@nestjs/config';
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: {
-        expiresIn: 60 * 60,
+        expiresIn: 600 * 60,
       },
     }),
     TypeOrmModule.forFeature([User, UserRepository]),

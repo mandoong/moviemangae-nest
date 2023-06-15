@@ -35,6 +35,11 @@ export class CommentController {
     return this.commentService.getCommentsByMovieId(id);
   }
 
+  @Get('/id/:id')
+  getCommentById(@Param('id', ParseIntPipe) id: number) {
+    return this.commentService.getCommentById(id);
+  }
+
   @Delete('/:id')
   deleteComment(@Param('id') id: number) {
     return this.commentService.deleteComment(id);

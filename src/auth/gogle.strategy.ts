@@ -1,10 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Strategy } from 'passport-google-oauth20';
-import { User } from '../user/user.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

@@ -6,14 +6,8 @@ import { google } from 'googleapis';
 
 @Controller('/auth')
 export class AuthController {
-  oauth2Client: any;
-  constructor(private readonly authService: AuthService) {
-    this.oauth2Client = new google.auth.OAuth2(
-      '1018839334367-qtgmojd5mkdi724mq0hinkm02rc1t99c.apps.googleusercontent.com',
-      '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',
-      'https://oqwc40fv0b.execute-api.ap-northeast-2.amazonaws.com/dev/auth/login/google-redirect',
-    );
-  }
+  // oauth2Client: any;
+  constructor(private readonly authService: AuthService) {}
 
   // @Get('login/google')
 

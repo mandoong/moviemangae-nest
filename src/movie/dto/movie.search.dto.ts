@@ -31,4 +31,7 @@ export class MovieSearchDto {
 
   @IsString()
   presentationType: string[];
+
+  @IsString()
+  sort: string[];
 }

@@ -30,7 +30,7 @@ export class CommentService {
 
     @InjectRepository(User)
     private userRepository: UserRepository,
-  ) { }
+  ) {}
 
   async getCommentsByMovieId(movie_id: number) {
     const result = await this.commentRepository.find({
@@ -49,6 +49,21 @@ export class CommentService {
     return result;
   }
 
+  async getCommentById(id: number) {
+    const result = await this.commentRepository.findOne({
+      where: { id: id },
+      relations: [
+        'children',
+        'children.user',
+        'liked_user',
+        'user',
+        'comment_movie',
+      ],
+    });
+
+    return result;
+  }
+
   async getAllComment(page = 0) {
     const result: Comment[] = await this.commentRepository.find({
       skip: page * 30,
@@ -57,6 +72,7 @@ export class CommentService {
         children: true,
         user: true,
         comment_movie: true,
+        parent: true,
       },
     });
 
@@ -66,7 +82,28 @@ export class CommentService {
   async getMyComment(req) {
     const result: Comment[] = await this.commentRepository.find({
       where: { user: { id: req.user.id } },
-      relations: { user: true, children: true, comment_movie: true },
+      relations: {
+        user: true,
+        children: true,
+        comment_movie: true,
+        parent: true,
+      },
+    });
+
+    return result;
+  }
+
+  async getMyBestComment(req) {
+    const today = new Date();
+
+    const result: Comment[] = await this.commentRepository.find({
+      where: { user: { id: req.user.id } },
+      relations: {
+        user: true,
+        children: true,
+        comment_movie: true,
+        parent: true,
+      },
     });
 
     return result;
@@ -80,8 +117,12 @@ export class CommentService {
 
     const movie = await this.movieRepository.findOne({
       where: { id: movie_id },
-      relations: ['comments'],
+      relations: ['comments', 'comments.user'],
     });
+
+    if (depth === 0 && movie.comments.some((e) => e.user.id === req.user.id)) {
+      throw new BadRequestException('이미 작성된 리뷰가 있습니다.');
+    }
 
     const comment = new Comment();
     comment.movie_id = movie_id;

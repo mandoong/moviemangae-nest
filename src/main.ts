@@ -38,7 +38,6 @@ async function bootstrap(): Promise<Handler> {
       '*',
     ],
     methods: ['GET', 'POST', 'DELETE'],
-    allowedHeaders: ['Authorization'],
     credentials: false,
   });
   app.use(cookieParser());

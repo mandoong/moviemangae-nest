@@ -77,6 +77,7 @@ export class MovieService {
       duration,
       dataCreated,
       presentationType = [],
+      sort = 'dataCreated',
     } = movieDto;
     const qb = this.movieRepository.createQueryBuilder('movie');
 
@@ -133,7 +134,7 @@ export class MovieService {
     const result = await qb
       .skip(page * 30)
       .take(30)
-      .orderBy({ 'movie.id': 'ASC' })
+      .orderBy({ [`movie.${sort}`]: 'DESC', 'movie.created_at': 'DESC' })
       .getMany();
 
     return result;
@@ -216,7 +217,7 @@ export class MovieService {
     const isLink = await this.movieLikeLinkRepository.findOne({
       where: { movie: { id }, user: { id: req.user.id }, type: type },
     });
-    console.log(isLink);
+
     if (isLink) {
       throw new BadRequestException('이미 목록에 있습니다');
     }
@@ -255,6 +256,13 @@ export class MovieService {
         link.movie = movie;
         link.user = user;
         link.type = 'bestMovie';
+        await this.movieLikeLinkRepository.save(link);
+        break;
+
+      case 'viewMovie':
+        link.movie = movie;
+        link.user = user;
+        link.type = 'viewMovie';
         await this.movieLikeLinkRepository.save(link);
         break;
     }

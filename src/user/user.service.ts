@@ -80,6 +80,12 @@ export class UserService {
         'best_movies.type = "bestMovie"',
       )
       .leftJoinAndSelect('best_movies.movie', 'best_movie')
+      .leftJoinAndSelect(
+        'user.view_movies',
+        'view_movies',
+        'view_movies.type = "viewMovie"',
+      )
+      .leftJoinAndSelect('view_movies.movie', 'view_movie')
       .getOne();
 
     return profile;
