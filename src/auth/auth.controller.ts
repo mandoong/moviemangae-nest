@@ -1,4 +1,12 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Req,
+  Res,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
@@ -61,5 +69,10 @@ export class AuthController {
   @UseGuards(AuthGuard('kakao'))
   async loginKakao(@Req() req: Request) {
     return this.authService.OAuthLogin(req);
+  }
+
+  @Post('/login/local')
+  async loginLocal(@Body('email') email, @Body('name') name) {
+    return this.authService.SignInUser(email, name);
   }
 }

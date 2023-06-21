@@ -23,6 +23,11 @@ export class UserController {
     return this.userService.getAllUser(page);
   }
 
+  @Get('/count')
+  getUserCount() {
+    return this.userService.getUserCount();
+  }
+
   @Get('/find/:id')
   getUser(@Param('id', ParseIntPipe) id: number) {
     return this.userService.getUser(id);

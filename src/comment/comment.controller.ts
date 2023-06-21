@@ -35,6 +35,11 @@ export class CommentController {
     return this.commentService.getCommentsByMovieId(id);
   }
 
+  @Get('/best')
+  getBestComments() {
+    return this.commentService.getBestComment();
+  }
+
   @Get('/id/:id')
   getCommentById(@Param('id', ParseIntPipe) id: number) {
     return this.commentService.getCommentById(id);

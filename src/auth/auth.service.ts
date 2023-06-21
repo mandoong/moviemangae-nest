@@ -59,6 +59,35 @@ export class AuthService {
     }
   }
 
+  async SignInUser(email: string, name: string) {
+    const isUser = await this.userRepository.findOne({
+      where: { email: email },
+    });
+    console.log(isUser);
+
+    let accessToken: string;
+
+    if (!isUser) {
+      const user = new User();
+      user.email = email;
+      user.password = '';
+      user.name = name;
+
+      await this.userRepository.save(user);
+
+      const userEmail = user.email;
+      const id = user.id;
+      const payload = { userEmail, id };
+      accessToken = this.jwtService.sign(payload);
+    } else {
+      const email = isUser.email;
+      const id = isUser.id;
+      const payload = { email, id };
+      accessToken = this.jwtService.sign(payload);
+    }
+    return accessToken;
+  }
+
   async OAuthLogin(req) {
     const { email } = req.user;
     const isUser = await this.userRepository.findOne({

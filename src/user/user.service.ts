@@ -16,6 +16,13 @@ export class UserService {
 
     return result;
   }
+
+  async getUserCount() {
+    const result = await this.userRepository.count();
+
+    return result;
+  }
+
   async getUser(id: number) {
     const result = await this.userRepository.findOne({ where: { id: id } });
 
@@ -53,6 +60,48 @@ export class UserService {
     const profile = await this.userRepository
       .createQueryBuilder('user')
       .where(`user.email = :email`, { email: email })
+      .select(['user.id', 'user.email', 'user.name'])
+      .leftJoinAndSelect(
+        'user.liked_movie',
+        'liked_movie',
+        'liked_movie.type = "likeMovie"',
+      )
+      .leftJoinAndSelect('liked_movie.movie', 'likeMovie')
+      .leftJoinAndSelect(
+        'user.disliked_movie',
+        'disliked_movie',
+        'disliked_movie.type = "dislikeMovie"',
+      )
+      .leftJoinAndSelect('disliked_movie.movie', 'dislikeMovie')
+      .leftJoinAndSelect(
+        'user.liked_comments',
+        'liked_comments',
+        'liked_comments.type = "comment"',
+      )
+      .leftJoinAndSelect('liked_comments.comment', 'comment')
+      .leftJoinAndSelect('comment.user', 'comment_user')
+      .leftJoinAndSelect('user.comments', 'comments')
+      .leftJoinAndSelect(
+        'user.best_movies',
+        'best_movies',
+        'best_movies.type = "bestMovie"',
+      )
+      .leftJoinAndSelect('best_movies.movie', 'best_movie')
+      .leftJoinAndSelect(
+        'user.view_movies',
+        'view_movies',
+        'view_movies.type = "viewMovie"',
+      )
+      .leftJoinAndSelect('view_movies.movie', 'view_movie')
+      .getOne();
+
+    return profile;
+  }
+
+  async getUserById(id: number) {
+    const profile = await this.userRepository
+      .createQueryBuilder('user')
+      .where(`user.id = :id`, { id: id })
       .select(['user.id', 'user.email', 'user.name'])
       .leftJoinAndSelect(
         'user.liked_movie',

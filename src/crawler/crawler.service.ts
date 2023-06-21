@@ -49,15 +49,16 @@ export class CrawlerService {
 
     let count = 0;
     let newCursor = '';
+    const sortList = ['TRENDING', 'POPULAR', 'RANDOM'];
 
     while (true) {
       const payload = {
         operationName: 'GetPopularTitles',
         variables: {
-          popularTitlesSortBy: 'POPULAR',
+          popularTitlesSortBy: 'TRENDING',
           first: 40,
           platform: 'WEB',
-          sortRandomSeed: 0,
+          sortRandomSeed: 1,
           popularAfterCursor: `${newCursor}`,
           popularTitlesFilter: {
             ageCertifications: [],
@@ -70,7 +71,7 @@ export class CrawlerService {
             excludeIrrelevantTitles: false,
             presentationTypes: [],
             monetizationTypes: [],
-            releaseYear: { min: 1999 },
+            releaseYear: { min: 2010 },
           },
           watchNowFilter: {
             packages: ['nfx', 'dnp', 'wac', 'cou'],
@@ -182,13 +183,13 @@ export class CrawlerService {
     const fullData = [];
     let count = 0;
 
-    const result = await this.crawlerRepository.find();
+    // const result = await this.crawlerRepository.find();
 
-    // const result = await this.crawlerRepository
-    //   .createQueryBuilder('crawler')
-    //   .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
-    //   .where('movie.movieId IS NULL')
-    //   .getMany();
+    const result = await this.crawlerRepository
+      .createQueryBuilder('crawler')
+      .leftJoinAndSelect('movie', 'movie', 'crawler.movieId = movie.movieId')
+      .where('movie.movieId IS NULL')
+      .getMany();
 
     result.forEach((ele) => {
       const job = CreateJob('list', ele.content);
@@ -247,6 +248,7 @@ export class CrawlerService {
             where: { movieId: movieId },
           });
           count++;
+          const time = `${new Date().getHours()}.${new Date().getMinutes()}.${new Date().getSeconds()}`;
 
           if (!isMovie) {
             const saveData = new Movie();
@@ -270,7 +272,7 @@ export class CrawlerService {
             saveData.genre = genre;
             saveData.updated_at = new Date();
 
-            console.log('New', q.length, title);
+            console.log('New', q.length, time, title);
 
             await this.movieRepository.save(saveData);
             this.getActor(actor, saveData);
@@ -292,7 +294,7 @@ export class CrawlerService {
             isMovie.genre = genre;
             isMovie.updated_at = new Date();
 
-            console.log('Update', q.length, title);
+            console.log('Update', q.length, time, title);
 
             await this.movieRepository.save(isMovie);
             this.getActor(actor, isMovie);

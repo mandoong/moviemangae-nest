@@ -15,6 +15,8 @@ import { UserRepository } from '../user/user.repository';
 import { Movie } from '../movie/movie.entity';
 import { MovieRepository } from '../movie/movie.repository';
 import { Request } from 'express';
+import { LessThan, MoreThan } from 'typeorm';
+import { relative } from 'path';
 
 @Injectable()
 export class CommentService {
@@ -74,6 +76,7 @@ export class CommentService {
         comment_movie: true,
         parent: true,
       },
+      order: { created_at: 'DESC' },
     });
 
     return result;
@@ -93,17 +96,20 @@ export class CommentService {
     return result;
   }
 
-  async getMyBestComment(req) {
+  async getBestComment() {
     const today = new Date();
+    const oneMonthAgo = new Date(today.setMonth(today.getMonth() - 1));
 
     const result: Comment[] = await this.commentRepository.find({
-      where: { user: { id: req.user.id } },
+      where: { created_at: MoreThan(oneMonthAgo) },
       relations: {
         user: true,
         children: true,
         comment_movie: true,
         parent: true,
       },
+      order: { like: 'DESC' },
+      take: 10,
     });
 
     return result;
@@ -160,6 +166,18 @@ export class CommentService {
   }
 
   async deleteComment(id: number) {
+    const links = await this.movieLikeLinkRepository.find({
+      where: { comment: { id: id } },
+      relations: { comment: true },
+    });
+
+    const children = await this.commentRepository.find({
+      where: { parent: { id: id } },
+      relations: { parent: true },
+    });
+
+    await this.movieLikeLinkRepository.remove(links);
+    await this.commentRepository.remove(children);
     await this.commentRepository.delete(id);
   }
 
