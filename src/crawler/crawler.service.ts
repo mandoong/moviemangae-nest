@@ -55,7 +55,7 @@ export class CrawlerService {
       const payload = {
         operationName: 'GetPopularTitles',
         variables: {
-          popularTitlesSortBy: 'TRENDING',
+          popularTitlesSortBy: 'POPULAR',
           first: 40,
           platform: 'WEB',
           sortRandomSeed: 1,
