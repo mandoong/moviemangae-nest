@@ -8,8 +8,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
     super({
       clientID: process.env.NAVER_CLIENT_ID,
       clientSecret: process.env.NAVER_SECRET,
-      callbackURL:
-        'https://moviemangae-front-git-develop-mandoong.vercel.app/login/naver',
+      callbackURL: 'https://https://fullbloommovies.com/login/naver',
     });
   }
 
