@@ -12,6 +12,7 @@ async function bootstrap(): Promise<Handler> {
     origin: [
       'https://moviemangae-front-git-develop-mandoong.vercel.app',
       'https://fullbloommovies.com',
+      'https://api.fullbloommovies.com',
       '*',
     ],
     methods: ['GET', 'POST', 'DELETE'],
