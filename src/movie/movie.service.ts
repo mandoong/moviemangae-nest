@@ -140,9 +140,7 @@ export class MovieService {
     return result;
   }
 
-  async getMovieOne(id: number, req) {
-    const userId = req.user.id;
-
+  async getMovieOne(id: number) {
     const result = await this.movieRepository
       .createQueryBuilder('movie')
       .where(`movie.id = '${id}'`)
