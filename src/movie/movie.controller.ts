@@ -26,7 +26,6 @@ export class MovieController {
   }
 
   @Get('/find/:id')
-  @UseGuards(AuthGuard())
   getMovieById(@Param('id') id: number) {
     return this.movieService.getMovieOne(id);
   }
