@@ -152,9 +152,15 @@ export class CommentService {
     return comment;
   }
 
-  async updateComment(id: number, content: string) {
-    const comment = await this.commentRepository.findOne({ where: { id: id } });
+  async updateComment(id: number, content: string, req) {
+    const comment = await this.commentRepository.findOne({
+      where: { id: id },
+      relations: { user: true },
+    });
 
+    if (req.user.id !== comment.user.id) {
+      throw new BadRequestException('해당 리뷰의 작성자가 아닙니다.');
+    }
     if (comment) {
       comment.content = content;
       await this.commentRepository.save(comment);
