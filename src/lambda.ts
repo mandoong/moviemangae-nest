@@ -11,10 +11,9 @@ async function bootstrap(): Promise<Handler> {
   app.enableCors({
     origin: [
       'http://localhost:5173',
-      'http://127.0.0.1:5173',
-      'http://localhost:5174',
-      'http://127.0.0.1:5174',
       'https://moviemangae-front-git-develop-mandoong.vercel.app',
+      'https://fullbloommovies.com',
+      'https://api.fullbloommovies.com',
       '*',
     ],
     methods: ['GET', 'POST', 'DELETE'],

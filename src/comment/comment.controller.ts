@@ -10,6 +10,7 @@ import {
   UseGuards,
   Req,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CommentCreateDto } from './dto/comment.create.dto';
@@ -48,6 +49,16 @@ export class CommentController {
   @Delete('/:id')
   deleteComment(@Param('id') id: number) {
     return this.commentService.deleteComment(id);
+  }
+
+  @Patch('/:id')
+  @UseGuards(AuthGuard())
+  updateComment(
+    @Param('id') id: number,
+    @Body('content') content: string,
+    @Req() req: Request,
+  ) {
+    return this.commentService.updateComment(id, content, req);
   }
 
   @Post('/')

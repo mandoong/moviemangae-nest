@@ -8,7 +8,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     super({
       clientID: process.env.KAKAO_CLIENT_ID,
       clientSecret: process.env.KAKAO_SECRET,
-      callbackURL: 'https://https://fullbloommovies.com/login/kakao',
+      callbackURL: 'https://fullbloommovies.com/login/kakao',
       scope: ['account_email', 'profile_nickname'],
     });
   }
