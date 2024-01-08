@@ -39,3 +39,4 @@ lerna-debug.log*
 .build
 *.zip
 .serverless
+.yml

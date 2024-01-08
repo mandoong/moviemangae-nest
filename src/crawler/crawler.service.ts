@@ -47,80 +47,84 @@ export class CrawlerService {
   async getMovieData() {
     const url = 'https://apis.justwatch.com/graphql';
 
-    let count = 0;
-    let newCursor = '';
-    const sortList = ['TRENDING', 'POPULAR', 'RANDOM'];
+    let sortList = ['TRENDING', 'POPULAR', 'RANDOM'];
 
-    while (true) {
-      const payload = {
-        operationName: 'GetPopularTitles',
-        variables: {
-          popularTitlesSortBy: 'POPULAR',
-          first: 40,
-          platform: 'WEB',
-          sortRandomSeed: 1,
-          popularAfterCursor: `${newCursor}`,
-          popularTitlesFilter: {
-            ageCertifications: [],
-            excludeGenres: [],
-            excludeProductionCountries: [],
-            genres: [],
-            objectTypes: ['MOVIE'],
-            productionCountries: [],
-            packages: ['nfx', 'dnp', 'wac', 'cou'],
-            excludeIrrelevantTitles: false,
-            presentationTypes: [],
-            monetizationTypes: [],
-            releaseYear: { min: 2010 },
+    for (let i of sortList) {
+      let count = 0;
+      let newCursor = '';
+      console.log(i, 'start');
+      while (true) {
+        const payload = {
+          operationName: 'GetPopularTitles',
+          variables: {
+            popularTitlesSortBy: i,
+            first: 40,
+            platform: 'WEB',
+            sortRandomSeed: 1,
+            popularAfterCursor: `${newCursor}`,
+            popularTitlesFilter: {
+              ageCertifications: [],
+              excludeGenres: [],
+              excludeProductionCountries: [],
+              genres: [],
+              objectTypes: ['MOVIE'],
+              productionCountries: [],
+              packages: ['nfx', 'dnp', 'wac', 'cou'],
+              excludeIrrelevantTitles: false,
+              presentationTypes: [],
+              monetizationTypes: [],
+              releaseYear: { min: 2010 },
+            },
+            watchNowFilter: {
+              packages: ['nfx', 'dnp', 'wac', 'cou'],
+              monetizationTypes: [],
+            },
+            language: 'ko',
+            country: 'KR',
           },
-          watchNowFilter: {
-            packages: ['nfx', 'dnp', 'wac', 'cou'],
-            monetizationTypes: [],
-          },
-          language: 'ko',
-          country: 'KR',
-        },
-        query:
-          'query GetPopularTitles($country: Country!, $popularTitlesFilter: TitleFilter, $watchNowFilter: WatchNowOfferFilter!, $popularAfterCursor: String, $popularTitlesSortBy: PopularTitlesSorting! = POPULAR, $first: Int! = 1, $language: Language!, $platform: Platform! = WEB, $sortRandomSeed: Int! = 0, $profile: PosterProfile, $backdropProfile: BackdropProfile, $format: ImageFormat) {\n  popularTitles(\n    country: $country\n    filter: $popularTitlesFilter\n    after: $popularAfterCursor\n    sortBy: $popularTitlesSortBy\n    first: $first\n    sortRandomSeed: $sortRandomSeed\n  ) {\n    totalCount\n    pageInfo {\n      startCursor\n      endCursor\n      hasPreviousPage\n      hasNextPage\n      __typename\n    }\n    edges {\n      ...PopularTitleGraphql\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment PopularTitleGraphql on PopularTitlesEdge {\n  cursor\n  node {\n    id\n    objectId\n    objectType\n    content(country: $country, language: $language) {\n      title\n      fullPath\n      scoring {\n        imdbScore\n        __typename\n      }\n      posterUrl(profile: $profile, format: $format)\n      ... on ShowContent {\n        backdrops(profile: $backdropProfile, format: $format) {\n          backdropUrl\n          __typename\n        }\n        __typename\n      }\n      isReleased\n      __typename\n    }\n    likelistEntry {\n      createdAt\n      __typename\n    }\n    dislikelistEntry {\n      createdAt\n      __typename\n    }\n    watchlistEntry {\n      createdAt\n      __typename\n    }\n    watchNowOffer(country: $country, platform: $platform, filter: $watchNowFilter) {\n      id\n      standardWebURL\n      package {\n        id\n        packageId\n        clearName\n        __typename\n      }\n      retailPrice(language: $language)\n      retailPriceValue\n      lastChangeRetailPriceValue\n      currency\n      presentationType\n      monetizationType\n      availableTo\n      __typename\n    }\n    ... on Movie {\n      seenlistEntry {\n        createdAt\n        __typename\n      }\n      __typename\n    }\n    ... on Show {\n      seenState(country: $country) {\n        seenEpisodeCount\n        progress\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n',
-      };
+          query:
+            'query GetPopularTitles($country: Country!, $popularTitlesFilter: TitleFilter, $watchNowFilter: WatchNowOfferFilter!, $popularAfterCursor: String, $popularTitlesSortBy: PopularTitlesSorting! = POPULAR, $first: Int! = 1, $language: Language!, $platform: Platform! = WEB, $sortRandomSeed: Int! = 0, $profile: PosterProfile, $backdropProfile: BackdropProfile, $format: ImageFormat) {\n  popularTitles(\n    country: $country\n    filter: $popularTitlesFilter\n    after: $popularAfterCursor\n    sortBy: $popularTitlesSortBy\n    first: $first\n    sortRandomSeed: $sortRandomSeed\n  ) {\n    totalCount\n    pageInfo {\n      startCursor\n      endCursor\n      hasPreviousPage\n      hasNextPage\n      __typename\n    }\n    edges {\n      ...PopularTitleGraphql\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment PopularTitleGraphql on PopularTitlesEdge {\n  cursor\n  node {\n    id\n    objectId\n    objectType\n    content(country: $country, language: $language) {\n      title\n      fullPath\n      scoring {\n        imdbScore\n        __typename\n      }\n      posterUrl(profile: $profile, format: $format)\n      ... on ShowContent {\n        backdrops(profile: $backdropProfile, format: $format) {\n          backdropUrl\n          __typename\n        }\n        __typename\n      }\n      isReleased\n      __typename\n    }\n    likelistEntry {\n      createdAt\n      __typename\n    }\n    dislikelistEntry {\n      createdAt\n      __typename\n    }\n    watchlistEntry {\n      createdAt\n      __typename\n    }\n    watchNowOffer(country: $country, platform: $platform, filter: $watchNowFilter) {\n      id\n      standardWebURL\n      package {\n        id\n        packageId\n        clearName\n        __typename\n      }\n      retailPrice(language: $language)\n      retailPriceValue\n      lastChangeRetailPriceValue\n      currency\n      presentationType\n      monetizationType\n      availableTo\n      __typename\n    }\n    ... on Movie {\n      seenlistEntry {\n        createdAt\n        __typename\n      }\n      __typename\n    }\n    ... on Show {\n      seenState(country: $country) {\n        seenEpisodeCount\n        progress\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n',
+        };
 
-      const result = await axios.post(url, payload);
+        const result = await axios.post(url, payload);
 
-      if (result.status === 200 && count < 1960) {
-        const edges = result.data.data.popularTitles.edges;
-        const newEdges = [];
+        if (result.status === 200 && count < 1960) {
+          const edges = result.data.data.popularTitles.edges;
+          const newEdges = [];
 
-        while (edges.length > 0) {
-          if (edges.length === 40) {
-            newCursor = edges[39].cursor;
+          while (edges.length > 0) {
+            if (edges.length === 40) {
+              newCursor = edges[39].cursor;
+            }
+            const edge = edges.pop();
+
+            const content = JSON.stringify(edge);
+            const movieId = edge.node.id;
+            const newData = new Crawler();
+
+            const value = await this.crawlerRepository.findOne({
+              where: { movieId: movieId },
+            });
+            count++;
+
+            if (!value) {
+              newData.content = content;
+              newData.movieId = movieId;
+              newEdges.push(newData);
+              console.log(count, 'New!', edge.node.content.title);
+            } else {
+              console.log(count);
+            }
           }
-          const edge = edges.pop();
 
-          const content = JSON.stringify(edge);
-          const movieId = edge.node.id;
-          const newData = new Crawler();
-
-          const value = await this.crawlerRepository.findOne({
-            where: { movieId: movieId },
-          });
-          count++;
-
-          if (!value) {
-            newData.content = content;
-            newData.movieId = movieId;
-            newEdges.push(newData);
-            console.log(count, 'New!', edge.node.content.title);
-          } else {
-            console.log(count);
-          }
+          await this.crawlerRepository.save(newEdges);
+        } else {
+          break;
         }
-
-        await this.crawlerRepository.save(newEdges);
-      } else {
-        console.log('End');
-        break;
       }
     }
+    await this.refineCrawlerData();
+    console.log('End');
   }
 
   async getActor(actors, movie: Movie) {
@@ -223,14 +227,14 @@ export class CrawlerService {
 
           const parseData = JSON.parse(movieScript.innerText);
           const content = parseData['@graph'];
-          const actor = content[0].actor;
-          const dateCreated = content[0].dateCreated;
-          const description = content[0].description;
-          const duration = content[0].duration;
-          const imageUrl = content[0].image || '';
+          const actor = parseData.actor || null;
+          const dateCreated = parseData.dateCreated;
+          const description = parseData.description;
+          const duration = parseData.duration;
+          const imageUrl = parseData.image || '';
           const director =
-            content[0].director.length >= 1 ? content[0].director[0].name : '';
-          const genre = JSON.stringify(content[0].genre);
+            parseData.director.length >= 1 ? parseData.director[0].name : '';
+          const genre = JSON.stringify(parseData.genre);
           const img = root.querySelector('.title-poster__image > img ');
           const main_imageUrl = img ? img.getAttribute('data-src') : null;
 
@@ -248,7 +252,7 @@ export class CrawlerService {
             where: { movieId: movieId },
           });
           count++;
-          const time = `${new Date().getHours()}.${new Date().getMinutes()}.${new Date().getSeconds()}`;
+          const time = `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
 
           if (!isMovie) {
             const saveData = new Movie();
